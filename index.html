@@ -1,1 +1,2575 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SIEE — Sistema de Informação da Educação Especial</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%93%9A%3C/text%3E%3C/svg%3E">
+<link rel="icon" type="image/x-icon" href="siee_favicon.ico">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
+
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface2: #1c2330;
+    --border: #30363d;
+    --accent: #2ea043;
+    --accent2: #58a6ff;
+    --accent3: #f78166;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --radius: 10px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Sora', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 2rem 1rem 4rem;
+  }
+
+  header {
+    max-width: 860px;
+    margin: 0 auto 2.5rem;
+    display: flex;
+    align-items: flex-end;
+    gap: 1rem;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 1.5rem;
+  }
+
+  .logo {
+    width: 46px; height: 46px;
+    background: #ffffff;
+    border-radius: 10px;
+    display: grid; place-items: center;
+    font-size: 1.4rem;
+    flex-shrink: 0;
+  }
+
+  h1 {
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: -.3px;
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+
+  h1 span {
+    display: block;
+    font-size: .78rem;
+    font-weight: 400;
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0;
+    margin-top: 3px;
+  }
+
+  .card {
+    max-width: 860px;
+    margin: 0 auto 1.5rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .card-header {
+    background: var(--surface2);
+    padding: .75rem 1.25rem;
+    font-size: .72rem;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--accent2);
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+  }
+
+  .card-header::before {
+    content: '';
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent2);
+    display: inline-block;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+    padding: 1.5rem;
+  }
+
+  .grid.three { grid-template-columns: 1fr 1fr 1fr; }
+  .grid.full { grid-template-columns: 1fr; }
+
+  .field { display: flex; flex-direction: column; gap: .45rem; }
+  .field.span2 { grid-column: span 2; }
+
+  label {
+    font-size: .72rem;
+    font-weight: 600;
+    color: var(--muted);
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: .4rem;
+  }
+
+  label .req { color: var(--accent3); font-size: .9em; }
+
+  input, select, textarea {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: var(--radius);
+    padding: .65rem .85rem;
+    font-family: 'Sora', sans-serif;
+    font-size: .9rem;
+    width: 100%;
+    transition: border-color .15s, box-shadow .15s;
+    outline: none;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+
+  select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238b949e' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right .75rem center;
+    padding-right: 2rem;
+    cursor: pointer;
+  }
+
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--accent2);
+    box-shadow: 0 0 0 3px rgba(88,166,255,.15);
+  }
+
+  input[type="date"] { color-scheme: dark; }
+
+  /* Checkbox group */
+  .check-group {
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+    padding: .65rem .85rem;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+  }
+
+  .check-item {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    cursor: pointer;
+    font-size: .88rem;
+  }
+
+  .check-item input[type="checkbox"] {
+    width: 16px; height: 16px;
+    flex-shrink: 0;
+    accent-color: var(--accent);
+    cursor: pointer;
+    padding: 0;
+    border: none;
+    appearance: checkbox;
+    -webkit-appearance: checkbox;
+  }
+
+  /* Actions */
+  .actions {
+    max-width: 860px;
+    margin: 0 auto;
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    padding: 0 0 .5rem;
+  }
+
+  button {
+    font-family: 'Sora', sans-serif;
+    font-size: .88rem;
+    font-weight: 600;
+    border: none;
+    border-radius: var(--radius);
+    padding: .7rem 1.5rem;
+    cursor: pointer;
+    transition: opacity .15s, transform .1s;
+    display: flex; align-items: center; gap: .5rem;
+  }
+
+  button:active { transform: scale(.97); }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+  }
+
+  .btn-secondary {
+    background: var(--surface2);
+    color: var(--muted);
+    border: 1px solid var(--border);
+  }
+
+  .btn-export {
+    background: transparent;
+    border: 1px solid var(--accent2);
+    color: var(--accent2);
+  }
+
+  .btn-clear-all {
+    font-family: 'Sora', sans-serif;
+    font-size: .88rem;
+    font-weight: 600;
+    background: transparent;
+    border: 1px solid var(--accent3);
+    color: var(--accent3);
+    border-radius: var(--radius);
+    padding: .7rem 1.5rem;
+    cursor: pointer;
+    transition: opacity .15s, transform .1s, background .15s;
+    display: flex; align-items: center; gap: .5rem;
+  }
+  .btn-clear-all:hover { background: rgba(247,129,102,.12); }
+  .btn-clear-all:active { transform: scale(.97); }
+
+  .btn-import {
+    font-family: 'Sora', sans-serif;
+    font-size: .88rem;
+    font-weight: 600;
+    background: transparent;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    border-radius: var(--radius);
+    padding: .7rem 1.5rem;
+    cursor: pointer;
+    transition: opacity .15s, transform .1s;
+    display: flex; align-items: center; gap: .5rem;
+  }
+  .btn-import:hover { opacity: .85; }
+  .btn-import:active { transform: scale(.97); }
+
+  button:hover { opacity: .85; }
+
+  /* Table */
+  .table-wrap {
+    overflow-x: auto;
+    padding: 1rem 1.25rem 1.25rem;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: .8rem;
+  }
+
+  thead th {
+    text-align: left;
+    padding: .6rem .75rem;
+    background: var(--surface2);
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .68rem;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+
+  tbody tr { border-bottom: 1px solid var(--border); transition: background .1s; }
+  tbody tr:hover { background: var(--surface2); }
+  tbody td { padding: .55rem .75rem; color: var(--text); vertical-align: middle; }
+  td.col-investigacao { max-width: 160px; }
+  td.col-investigacao .badge { display: inline-block; max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; vertical-align: bottom; cursor: default; }
+
+  .badge {
+    display: inline-block;
+    padding: .15rem .55rem;
+    border-radius: 999px;
+    font-size: .7rem;
+    font-weight: 600;
+  }
+
+  .badge-yes { background: rgba(46,160,67,.2); color: var(--accent); }
+  .badge-no  { background: rgba(247,129,102,.15); color: var(--accent3); }
+
+  .del-btn {
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: .85rem;
+    padding: .2rem .4rem;
+    border-radius: 4px;
+    transition: color .15s;
+  }
+  .del-btn:hover { color: var(--accent3); }
+
+  .edit-btn {
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: .85rem;
+    padding: .2rem .4rem;
+    border-radius: 4px;
+    transition: color .15s;
+  }
+  .edit-btn:hover { color: var(--accent2); }
+
+  select:disabled, input:disabled {
+    opacity: .4;
+    cursor: not-allowed;
+  }
+
+  /* Destaque do formulário quando em modo edição */
+  .editing-mode {
+    outline: 2px solid var(--accent2);
+    outline-offset: 4px;
+  }
+
+  .empty-state {
+    padding: 2.5rem 1rem;
+    text-align: center;
+    color: var(--muted);
+    font-size: .85rem;
+  }
+
+  /* Paginação */
+  .pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: .75rem 1.25rem;
+    border-top: 1px solid var(--border);
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .pagination-info {
+    font-size: .75rem;
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .pagination-controls { display: flex; align-items: center; gap: .4rem; }
+  .page-btn {
+    font-family: 'Sora', sans-serif;
+    font-size: .78rem; font-weight: 600;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    border-radius: 6px; padding: .3rem .65rem;
+    cursor: pointer; transition: all .15s;
+  }
+  .page-btn:hover:not(:disabled) { border-color: var(--accent2); color: var(--accent2); }
+  .page-btn.active { background: var(--accent2); border-color: var(--accent2); color: #fff; }
+  .page-btn:disabled { opacity: .3; cursor: not-allowed; }
+  .per-page-select {
+    font-family: 'JetBrains Mono', monospace; font-size: .75rem;
+    background: var(--surface2); border: 1px solid var(--border);
+    color: var(--muted); border-radius: 6px; padding: .3rem .5rem;
+    cursor: pointer; outline: none; appearance: none;
+  }
+
+  /* Search */
+  .search-wrap {
+    display: flex; align-items: center;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: .25rem .65rem;
+    gap: .4rem;
+    transition: border-color .15s, box-shadow .15s;
+    min-width: 260px;
+  }
+  .search-wrap:focus-within {
+    border-color: var(--accent2);
+    box-shadow: 0 0 0 3px rgba(88,166,255,.12);
+  }
+  .search-icon { color: var(--muted); font-size: 1.05rem; flex-shrink: 0; line-height: 1; }
+  .search-input {
+    background: none; border: none; outline: none; box-shadow: none;
+    color: var(--text); font-family: 'Sora', sans-serif;
+    font-size: .78rem; padding: .2rem 0; width: 100%;
+    appearance: none; -webkit-appearance: none;
+  }
+  .search-input::placeholder { color: var(--muted); font-size: .74rem; }
+  .search-clear {
+    background: none; border: none; color: var(--muted);
+    cursor: pointer; font-size: .75rem; padding: 0;
+    line-height: 1; flex-shrink: 0; transition: color .15s;
+  }
+  .search-clear:hover { color: var(--accent3); }
+  mark.hl { background: rgba(88,166,255,.28); color: var(--text); border-radius: 2px; padding: 0 1px; }
+
+  /* Toast */
+  #toast {
+    position: fixed;
+    bottom: 2rem; right: 2rem;
+    background: var(--surface2);
+    border: 1px solid var(--accent);
+    color: var(--text);
+    padding: .75rem 1.25rem;
+    border-radius: var(--radius);
+    font-size: .85rem;
+    transform: translateY(6rem);
+    opacity: 0;
+    transition: all .3s;
+    z-index: 100;
+    display: flex; align-items: center; gap: .5rem;
+    max-width: 320px;
+  }
+
+  #toast.show { transform: translateY(0); opacity: 1; }
+
+  /* Login overlay */
+  #loginOverlay {
+    position: fixed; inset: 0;
+    background: var(--bg);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 999;
+  }
+
+  .login-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2.5rem 2rem;
+    width: 100%; max-width: 360px;
+    display: flex; flex-direction: column; gap: 1.5rem;
+  }
+
+  .login-box .logo-wrap {
+    display: flex; align-items: center; gap: .9rem;
+  }
+
+  .login-box h2 {
+    font-size: 1.1rem; font-weight: 700; letter-spacing: -.3px; line-height: 1.2;
+  }
+
+  .login-box h2 span {
+    display: block; font-size: .72rem; font-weight: 400;
+    color: var(--muted); font-family: 'JetBrains Mono', monospace; margin-top: 3px;
+  }
+
+  .login-error {
+    font-size: .78rem; color: var(--accent3);
+    background: rgba(247,129,102,.1);
+    border: 1px solid rgba(247,129,102,.25);
+    border-radius: 6px; padding: .5rem .75rem;
+    display: none;
+  }
+
+  .login-error.show { display: block; }
+
+  /* User badge no header */
+  .user-badge {
+    margin-left: auto;
+    display: flex; align-items: center; gap: .75rem;
+    font-size: .78rem; color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .user-badge strong { color: var(--accent2); }
+
+  .btn-logout {
+    font-family: 'Sora', sans-serif;
+    font-size: .75rem; font-weight: 600;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    border-radius: 6px; padding: .3rem .8rem;
+    cursor: pointer; transition: color .15s, border-color .15s;
+  }
+  .btn-logout:hover { color: var(--accent3); border-color: var(--accent3); }
+
+  @media (max-width: 600px) {
+    .grid { grid-template-columns: 1fr; }
+    .grid.three { grid-template-columns: 1fr 1fr; }
+    .field.span2 { grid-column: span 1; }
+    .actions { flex-wrap: wrap; }
+  }
+</style>
+</head>
+<body>
+
+<!-- LOGIN OVERLAY -->
+<div id="loginOverlay">
+  <div class="login-box">
+    <div class="logo-wrap">
+      <div class="logo">📚</div>
+      <h2>SIEE<span>Acesso restrito</span></h2>
+    </div>
+    <div class="field">
+      <label>Usuário</label>
+      <input type="text" id="loginUser" placeholder="Digite seu usuário" onkeydown="if(event.key==='Enter') document.getElementById('loginInput').focus()" autocomplete="username">
+    </div>
+    <div class="field">
+      <label>Senha</label>
+      <div style="position:relative;">
+        <input type="password" id="loginInput" placeholder="Digite sua senha" onkeydown="if(event.key==='Enter') doLogin()" style="padding-right:2.5rem" autocomplete="current-password">
+        <button type="button" id="togglePwd" onclick="togglePassword()" title="Mostrar/ocultar senha"
+          style="position:absolute;right:.65rem;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted);cursor:pointer;font-size:1rem;padding:0;line-height:1;transition:color .15s;"
+          onmouseover="this.style.color='var(--accent2)'" onmouseout="this.style.color='var(--muted)'">👁</button>
+      </div>
+    </div>
+    <div id="loginError" class="login-error">Usuário ou senha incorretos. Tente novamente.</div>
+    <button type="button" class="btn-primary" style="width:100%;justify-content:center" onclick="doLogin()">Entrar</button>
+  </div>
+</div>
+
+<header>
+  <div class="logo">📚</div>
+  <h1>
+    SIEE — Sistema de Informação da Educação Especial
+    <span>Educação Especial · Secretaria Municipal de Educação</span>
+  </h1>
+  <div class="user-badge">
+    Logado como <strong id="userLabel">—</strong>
+    <button class="btn-logout" onclick="doLogout()">Sair</button>
+  </div>
+</header>
+
+<!-- FORM -->
+<form id="neeForm">
+
+  <!-- Identificação -->
+  <div class="card">
+    <div class="card-header">Identificação do Aluno</div>
+    <div class="grid">
+      <div class="field">
+        <label>ID</label>
+        <input type="text" id="num" readonly placeholder="Gerado automaticamente"
+          style="opacity:.5;cursor:default;background:var(--surface2)">
+      </div>
+      <div class="field">
+        <label>CPF <span class="req">*</span></label>
+        <input type="text" id="cpf" placeholder="000.000.000-00" maxlength="14" required>
+      </div>
+      <div class="field span2">
+        <label>Nome do Aluno <span class="req">*</span></label>
+        <input type="text" id="aluno" placeholder="Nome completo" required>
+      </div>
+      <div class="field">
+        <label>Data de Nascimento <span class="req">*</span></label>
+        <input type="date" id="data_nascimento" required>
+      </div>
+      <div class="field">
+        <label>Sexo <span class="req">*</span></label>
+        <select id="sexo" required>
+          <option value="">— selecione —</option>
+          <option>Masculino</option>
+          <option>Feminino</option>
+        </select>
+      </div>
+      <div class="field span2">
+        <label>Unidade Escolar <span class="req">*</span></label>
+        <select id="unidade_escolar" required disabled>
+          <option value="">— selecione —</option>
+          <option>CE 29 de Maio</option>
+          <option>CEM Aldeia</option>
+          <option>CEM Ana Beatriz Rangel da Silva</option>
+          <option>CEM Anísio Spínola Teixeira</option>
+          <option>CEM Antonino Venâncio</option>
+          <option>CEM Antônio Nunes Vieira</option>
+          <option>CEM Ataliba Carvalho de Brito</option>
+          <option>CEM Álvaro Ribeiro das Neves</option>
+          <option>CEM Beira do Taí</option>
+          <option>CEM Benedito Alves Barreto</option>
+          <option>CEM Bruno da Silva Macabu</option>
+          <option>CEM Conceição do Imbé</option>
+          <option>CEM Desembargador Sebastião Amaro da Silva Machado</option>
+          <option>CEM Dom Antônio de Castro Mayer</option>
+          <option>CEM Dom Hélder Câmara</option>
+          <option>CEM Donana</option>
+          <option>CEM Dr. Félix Miranda - inclusão 26</option>
+          <option>CEM Emídio Teixeira de Oliveira</option>
+          <option>CEM Enéas Tavares Trindade</option>
+          <option>CEM Erivelton Junior</option>
+          <option>CEM Farol de São Thomé</option>
+          <option>CEM Felismindo Marques Barreto</option>
+          <option>CEM Francisco Alves Dias</option>
+          <option>CEM Francisco Cordeiro Pereira</option>
+          <option>CEM Francisco de Assis</option>
+          <option>CEM Gandur Assed</option>
+          <option>CEM Getúlio Vargas</option>
+          <option>CEM Gilberto do Espírito Santo Amaral</option>
+          <option>CEM Glicério Carlos Neto</option>
+          <option>CEM Grevi Siqueira</option>
+          <option>CEM Henrique Jardim da Cruz</option>
+          <option>CEM Irmã Dulce</option>
+          <option>CEM Irmã Zilda</option>
+          <option>CEM Irmã Zilda de Castro</option>
+          <option>CEM Jardim Ceasa</option>
+          <option>CEM João Batista Veiga</option>
+          <option>CEM João Goulart</option>
+          <option>CEM João Perdecene Neto</option>
+          <option>CEM João Siqueira dos Santos</option>
+          <option>CEM Jocineia da Silva Borges</option>
+          <option>CEM José Cândido de Carvalho</option>
+          <option>CEM José Eduardo Peixoto Zandonaide</option>
+          <option>CEM José Silveira Lubanco</option>
+          <option>CEM José de Souza Sodre</option>
+          <option>CEM Luiz Gonzaga da Silva</option>
+          <option>CEM Madre Tereza de Calcutá</option>
+          <option>CEM Maria da Conceição Santos Tavares</option>
+          <option>CEM Maria de Lourdes</option>
+          <option>CEM Martin Luther King</option>
+          <option>CEM Mãe Flor</option>
+          <option>CEM Mirian dos Santos Melo</option>
+          <option>CEM Monteiro Lobato</option>
+          <option>CEM Nadir Pereira Gomes</option>
+          <option>CEM Norberto Siqueira Barreto</option>
+          <option>CEM Olímpio Paulo da Silva</option>
+          <option>CEM Parque Aurora</option>
+          <option>CEM Parque Guarus</option>
+          <option>CEM Parque Imperial</option>
+          <option>CEM Parque Prazeres</option>
+          <option>CEM Parque Santos Dumont</option>
+          <option>CEM Penha</option>
+          <option>CEM Prof. Paulo Freire</option>
+          <option>CEM Prof.ª Ângela Maria do Amaral</option>
+          <option>CEM Prof.ª Diva Marina Suppa Goulart</option>
+          <option>CEM Prof.ª Joelma Figueiredo de Souza</option>
+          <option>CEM Prof.ª Olga Linhares Corrêa</option>
+          <option>CEM Prof.ª Rita de Cássia Rocha Soares Chardelli</option>
+          <option>CEM Prof.ª Ruth Chagas Manhães</option>
+          <option>CEM Salvador Rangel Lopes</option>
+          <option>CEM São Matheus</option>
+          <option>CEM Sebastião Tavares Campista</option>
+          <option>CEM Sérgio Luiz Lilico Paes da Silva</option>
+          <option>CEM Silvina Manhães Terra</option>
+          <option>CEM Subtenente Cláudio Henrique Laurindo de Cravalho</option>
+          <option>CEM Vera Pretyman</option>
+          <option>CEM Vereadora Hermeny Coutinho</option>
+          <option>CEM Wilson Amaro de Freitas</option>
+          <option>CEM Zumbi dos Palmares</option>
+          <option>CEMSTIAC</option>
+          <option>CIEP Brizolão 142 Maestro Villa Lobos</option>
+          <option>CIEP Brizolão 144 Prof.ª Carmem Sylvia Carneiro</option>
+          <option>CIEP Brizolão 269 Francisco Portela</option>
+          <option>CIEP Brizolão 416 Wilson Batista</option>
+          <option>CIEP Brizolão 481 Arnaldo Rosa Viana</option>
+          <option>EM APIC</option>
+          <option>EM Alayr Bernardes Pereira</option>
+          <option>EM Albertina Azeredo Venâncio</option>
+          <option>EM Alberto Lamego (Martins Lage)</option>
+          <option>EM Alberto Lamego (Poço Gordo)</option>
+          <option>EM Alcebíades Candiano</option>
+          <option>EM Alfredo Vieira Machado</option>
+          <option>EM Alicério Ribeiro da Silva</option>
+          <option>EM Amaro Antônio da Silva</option>
+          <option>EM Amaro Prata Tavares</option>
+          <option>EM Ambrósio de Souza</option>
+          <option>EM Anleifer Leite Fernandes - Educação Especial</option>
+          <option>EM Antônia Lopes</option>
+          <option>EM Antônio Caetano Peixoto</option>
+          <option>EM Antônio Joaquim Codeço</option>
+          <option>EM Antônio de Souza Rodrigues</option>
+          <option>EM Ary Batista Rangel</option>
+          <option>EM Augusto Machado Viana</option>
+          <option>EM Barreto</option>
+          <option>EM Bartholomeu Lysandro</option>
+          <option>EM Branca Peçanha Ferreira</option>
+          <option>EM Califórnia</option>
+          <option>EM Carlos Chagas</option>
+          <option>EM Carlos Jardim da Cruz</option>
+          <option>EM Cláudia Almeida Pinto de Oliveira</option>
+          <option>EM Clóvis Tavares</option>
+          <option>EM Conceição do Imbé</option>
+          <option>EM Conselheiro Josino</option>
+          <option>EM Coronel Antônio Batista</option>
+          <option>EM Custódio Generoso Vieira</option>
+          <option>EM Custódio Siqueira</option>
+          <option>EM Donana</option>
+          <option>EM Dr. Alcindor Moraes Bessa</option>
+          <option>EM Dr. Francisco Manoel Pereira Crespo</option>
+          <option>EM Dr. Getúlio Vargas</option>
+          <option>EM Dr. Luiz Guaraná</option>
+          <option>EM Dr. Luiz Sobral Quadro de Educação Especial</option>
+          <option>EM Eloy Ornelas</option>
+          <option>EM Etelvira Martins Medeiros</option>
+          <option>EM Farol de São Tomé</option>
+          <option>EM Fazenda Aleluia</option>
+          <option>EM Fazenda Chalita</option>
+          <option>EM Felício Sarlo</option>
+          <option>EM Ferroviário Jacy da Silva Barbeto</option>
+          <option>EM Francisco Faria Barbosa</option>
+          <option>EM Francisco Ribeiro Siqueira</option>
+          <option>EM Francisco Ricardo Lysandro de Albernaz Santos (KM 15)</option>
+          <option>EM Francisco Ricardo Lysandro de Albernaz Santos (Mundéus)</option>
+          <option>EM Francisco de Assis - Sala de Recursos</option>
+          <option>EM Frederico Paes Barbosa</option>
+          <option>EM Genésio Viana</option>
+          <option>EM Gervásio Vasconcelos Cordeiro</option>
+          <option>EM Gonçalo Francisco Nunes</option>
+          <option>EM Guiomar Ramos Paes</option>
+          <option>EM Heitor Alves Barreto</option>
+          <option>EM Helena Machado de Oliveira</option>
+          <option>EM Ignácio Corrêa dos Santos</option>
+          <option>EM Iniciação Agrícola José Francisco Mota Vasconcelos</option>
+          <option>EM Instituto Profissional São José</option>
+          <option>EM Isabel Maria Polônio</option>
+          <option>EM Jacques Richer</option>
+          <option>EM Jardim de Infância Alva Doralice Ribeiro de Castro</option>
+          <option>EM Joanir Sanguedo Boynard</option>
+          <option>EM João Batista de Azeredo</option>
+          <option>EM João Borges Barreto</option>
+          <option>EM João Carlos de Castro</option>
+          <option>EM João Goulart</option>
+          <option>EM José Carneiro Terra</option>
+          <option>EM José Giró Faisca</option>
+          <option>EM José Manoel da Silva</option>
+          <option>EM José das Chagas Pinto</option>
+          <option>EM José de Anchieta</option>
+          <option>EM José de Azevedo</option>
+          <option>EM José do Patrocínio</option>
+          <option>EM Leandro de Souza Gomes</option>
+          <option>EM Leopoldino Maria</option>
+          <option>EM Leôncio Pereira Gomes</option>
+          <option>EM Lions Goitacá_Educação Especial</option>
+          <option>EM Lions I </option>
+          <option>EM Lions II</option>
+          <option>EM Lídia Leitão de Albernaz</option>
+          <option>EM Luis Carlos de Lacerda</option>
+          <option>EM Luiz Monteiro Barbosa</option>
+          <option>EM Lulo Ferreira de Araújo</option>
+          <option>EM Manoel Coelho</option>
+          <option>EM Manoel Corrêa Gonçalves</option>
+          <option>EM Manoel Pereira Gonçalves</option>
+          <option>EM Manoel Ribeiro do Nascimento</option>
+          <option>EM Manoel Simões de Rezende</option>
+          <option>EM Marechal Artur da Costa e Silva</option>
+          <option>EM Maria Antônia Pessanha Trindade</option>
+          <option>EM Maria Arlete Azevedo Araújo</option>
+          <option>EM Maria Cordeiro Borges</option>
+          <option>EM Maria Lúcia</option>
+          <option>EM Maria Queiroz de Oliveira</option>
+          <option>EM Mario Barroso</option>
+          <option>EM Marlene Henriques Alves</option>
+          <option>EM Miguel Henrique Gomes</option>
+          <option>EM Nação Goitacá</option>
+          <option>EM Nossa Senhora Aparecida</option>
+          <option>EM Nossa Senhora da Conceição</option>
+          <option>EM Olavo Alves Saldanha Filho</option>
+          <option>EM Olímpio Honório de Almeida</option>
+          <option>EM Olímpio Peixoto Sampaio</option>
+          <option>EM Pedro Barbosa</option>
+          <option>EM Pequeno Frederico</option>
+          <option>EM Pequeno Jornaleiro</option>
+          <option>EM Ponta da Palha</option>
+          <option>EM Posse do Meio</option>
+          <option>EM Presidente Castelo Branco</option>
+          <option>EM Prisco de Almeida</option>
+          <option>EM Prof. Carlos Bruno</option>
+          <option>EM Prof. Darcy Ribeiro</option>
+          <option>EM Prof. Fernando de Andrade</option>
+          <option>EM Prof. Paulo Freire</option>
+          <option>EM Prof. Walter Siqueira</option>
+          <option>EM Prof.ª Eleonora Silva Pinto Viana</option>
+          <option>EM Prof.ª Eunícia Ferreira da Silva</option>
+          <option>EM Prof.ª Maria Ângela Moreira Pinto</option>
+          <option>EM Prof.ª Olga Linhares Correa</option>
+          <option>EM Prof.ª Wilmar Cava Barros</option>
+          <option>EM Raymundo Soares Filho</option>
+          <option>EM Rotary I</option>
+          <option>EM Sagrada Família</option>
+          <option>EM Salvador Benzi</option>
+          <option>EM Santa Bárbara</option>
+          <option>EM Santa Maria</option>
+          <option>EM Santa Rita de Cássia</option>
+          <option>EM Santa Terezinha</option>
+          <option>EM Santo Amaro</option>
+          <option>EM Santo Antônio</option>
+          <option>EM Sebastião Ribeiro de Deus</option>
+          <option>EM Sebastião Viveiros de Vasconcelos</option>
+          <option>EM Senador José Carlos Pereira Pinto</option>
+          <option>EM Senador Tarcísio Miranda</option>
+          <option>EM Sesmaria</option>
+          <option>EM Sérgio Viana Barroso</option>
+          <option>EM Tarcílio Siqueira Cordeiro</option>
+          <option>EM Thierry Homero Ribeiro Gomes</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Escolaridade -->
+  <div class="card">
+    <div class="card-header">Dados Escolares</div>
+    <div class="grid three">
+      <div class="field">
+        <label>Ano de Escolaridade <span class="req">*</span></label>
+        <select id="ano_escolaridade" required>
+          <option value="">— selecione —</option>
+          <option>Berçário</option><option>G1</option><option>G2</option><option>G3</option>
+          <option>Pré I</option><option>Pré II</option><option>1º ano</option><option>2º ano</option>
+          <option>3º ano</option><option>4º ano</option><option>5º ano</option><option>6º ano</option>
+          <option>7º ano</option><option>8º ano</option><option>9º ano</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Turno <span class="req">*</span></label>
+        <select id="turno" required>
+          <option value="">— selecione —</option>
+          <option>Manhã</option><option>Tarde</option><option>Integral</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Ordem Judicial</label>
+        <select id="ordem_judicial">
+          <option value="">— selecione —</option>
+          <option>Sim</option><option>Não</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Diagnóstico -->
+  <div class="card">
+    <div class="card-header">Diagnóstico</div>
+    <div class="grid">
+      <div class="field">
+        <label>Tipo de Deficiência <span class="req">*</span></label>
+        <select id="tipo_deficiencia" required>
+          <option value="">— selecione —</option>
+          <option>Autismo - F84.0</option>
+          <option>TDAH - F90.0</option>
+          <option>Deficiência Física - Z73</option>
+          <option>Deficiência Visual - H54</option>
+          <option>Deficiência Auditiva - H90</option>
+          <option>Deficiência Intelectual - F79</option>
+          <option>Transtorno Opositor - F91.3</option>
+          <option>Paralisia Cerebral - G80</option>
+          <option>Síndrome de Down - Q90</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Ano do Laudo</label>
+        <select id="ano_laudo">
+          <option value="">— selecione —</option>
+          <option>2019</option><option>2020</option><option>2021</option><option>2022</option>
+          <option>2023</option><option>2024</option><option>2025</option><option>2026</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Caso Severo</label>
+        <select id="caso_severo">
+          <option value="">— selecione —</option>
+          <option>Sim</option><option>Não</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Situação / Investigação <span class="req">*</span></label>
+        <select id="investigacao" required onchange="onSituacaoChange()">
+          <option value="">— selecione —</option>
+          <option>Com laudo</option>
+          <option>Estudo</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Apoio -->
+  <div class="card">
+    <div class="card-header">Apoio e Suporte</div>
+    <div class="grid">
+      <div class="field">
+        <label>Mediador</label>
+        <select id="mediador">
+          <option value="">— selecione —</option>
+          <option>Adriana Barbosa Mesquita</option>
+          <option>Adriana Manhães de Carvalho</option>
+          <option>Adriana Santos</option>
+          <option>Adriana Silva Pinheiro Santos</option>
+          <option>Airê Katúscia de Souza Vieira</option>
+          <option>Alba Valéria Silva</option>
+          <option>Alcinea Romao Valerio</option>
+          <option>Alcione Ribeiro da Silva Ancillotti</option>
+          <option>Alda Maria Raposo Lanhas</option>
+          <option>Alessandra Barbosa da Silva Lemos</option>
+          <option>Alessandra Machado Sales</option>
+          <option>Alessandra Pereira Ferreira</option>
+          <option>Alessandra Rangel de Barros</option>
+          <option>Alessandra da Silva Sales</option>
+          <option>Alice Campos Barreto Nunes</option>
+          <option>Aline Lacerda da Silva</option>
+          <option>Aline Velasco Augusto</option>
+          <option>Aline de Souza Pinto</option>
+          <option>Alinne Lopes Azevedo</option>
+          <option>Allicy Aparecida Gomes Barreto</option>
+          <option>Amanda Alves Almeida</option>
+          <option>Amanda Andrade</option>
+          <option>Amanda Mendonça Tavares</option>
+          <option>Ana Carolina Paulo da Silva Ribeiro</option>
+          <option>Ana Cristina dos Santos Oliveira</option>
+          <option>Ana Kethleen da Silva Oliveira</option>
+          <option>Ana Lucia Pessanha dos Santos</option>
+          <option>Ana Lúcia Francisco de Oliveira Lopes</option>
+          <option>Ana Paula Quintanilha da Silva</option>
+          <option>Ana Paula da Silva Batista</option>
+          <option>Andrea Barroso Narciso Pereira</option>
+          <option>Andrea Rangel Pinto</option>
+          <option>Andreia Cristina Lemos Ribeiro</option>
+          <option>Andressa Rambaldi Borges Padilha</option>
+          <option>Andressa de Sousa Rodrigues</option>
+          <option>Andreza Mariano de Oliveira</option>
+          <option>Andrezza Gomes Pereira</option>
+          <option>Andréa de Souza do Nascimento</option>
+          <option>Andréia Ribeiro Azevedo</option>
+          <option>Anna Karollyna Monteiro de Oliveira</option>
+          <option>Aquila Barcellos Rodrigues</option>
+          <option>Ariana Costa Alves</option>
+          <option>Ariana Rangel Pereira</option>
+          <option>Ariane Peixoto Sardinha Ribeiro</option>
+          <option>Arielma da Conceição Neto Felismindo</option>
+          <option>Arlete Alves da Silva Ribeiro</option>
+          <option>Aurea Ines Reis</option>
+          <option>Beatriz Soares Ferreira Carvalhal</option>
+          <option>Betania da Silva Ramos de Melo</option>
+          <option>Bianca Carvalho Viana</option>
+          <option>Bianca Gonçalves Silva dos Santos</option>
+          <option>Bruna Alves</option>
+          <option>Bruna Dias R.r Nascimento</option>
+          <option>Bruna Silva Rosa</option>
+          <option>Brunna Ribeiro Basilio de Oliveira Siqueira</option>
+          <option>Camila Albano Rangel Coutinho</option>
+          <option>Camila Souza da Gama</option>
+          <option>Camilla Salvadora Dias</option>
+          <option>Carine Pereira Araújo Almeida</option>
+          <option>Carla Beatriz Batista Borges</option>
+          <option>Carla Cristina dos Santos Monteiro Pereira</option>
+          <option>Carla Cristina dos Santos Oliveira</option>
+          <option>Carla Elaine Machado de Sousa</option>
+          <option>Carla Justino da Silva Justino</option>
+          <option>Carla Mendonça Batista</option>
+          <option>Carla Ribeiro Miranda</option>
+          <option>Carla dos Santos Gonçalves</option>
+          <option>Carlos Magno Peixoto Cordeiro</option>
+          <option>Caroline Dias de Souza Vieira</option>
+          <option>Caroline Severino dos Santos</option>
+          <option>Caroline Xavier Barreto</option>
+          <option>Catia Silene Francisco do Espírito Santo</option>
+          <option>Celiane Sardinha Carmelo</option>
+          <option>Chistiane Aguiar Ribeiro</option>
+          <option>Christiane Monteiro de Oliveira</option>
+          <option>Cintia Henriques Viana Barreto</option>
+          <option>Cintya Santiago Dias Gomes</option>
+          <option>Clara Figueiredo</option>
+          <option>Clarice Almeida de Souza</option>
+          <option>Claudia Cordeiro da Silva Menezes</option>
+          <option>Claudia Marcia da Silva Pessanha Soares</option>
+          <option>Claudia Márcia da Penha de Almeida</option>
+          <option>Cleide de Castro Alves</option>
+          <option>Cláudia Marcia Chagas de Pliveira</option>
+          <option>Cláudia Marcia Paes</option>
+          <option>Cláudia Márcia Siqueira Rangel</option>
+          <option>Cristani Del Esposti</option>
+          <option>Cristiane da Silva Correa</option>
+          <option>Cristina Paravidini do Amaral Costa</option>
+          <option>Cíntia Francisca Gomes Caneca</option>
+          <option>Daffiny Vicanor Peixoto</option>
+          <option>Daiane Ferreira</option>
+          <option>Damião Severo de Souza</option>
+          <option>Daniel Guimarães da Silva Monteiro</option>
+          <option>Daniele Andrade da Silva</option>
+          <option>Daniele Piedade Faria</option>
+          <option>Daniele de Abreu Gomes</option>
+          <option>Daniele de Souza Henrique Moço</option>
+          <option>Danielle Ferreira da Costa Siqueira</option>
+          <option>Danielle Gomes de Souza</option>
+          <option>Debora Renata</option>
+          <option>Deise Camara Brito</option>
+          <option>Dejimara Ferreira Medeiros Martins</option>
+          <option>Denys Ribeiro</option>
+          <option>Diane Lizst Gonçalves Nunes</option>
+          <option>Dolores Oliveira dos Santos</option>
+          <option>Débora de Souza Brito</option>
+          <option>Edilane Madalena Corrêa Paula</option>
+          <option>Edna Moço da Costa</option>
+          <option>Eduarda Vitória da Silva Costa Ameida</option>
+          <option>Elaine Cristina Barreiras de Oliveira dos Santos</option>
+          <option>Eldamárcia Mendes da Cruz dos Santos</option>
+          <option>Elenice Ferreira Fernandes da Silva</option>
+          <option>Eliana Machado dos Santos Dias Firmino</option>
+          <option>Eliane Maria Nunes Pereira Laurindo</option>
+          <option>Eliane da Conceição Bernardino da Silva</option>
+          <option>Elisangela da Silva Rosário</option>
+          <option>Elisângela Soares Barcelos</option>
+          <option>Elisângela de Souza Arêas</option>
+          <option>Elizabete Gomes de Assis</option>
+          <option>Elíbia Gomes Cabral Santos</option>
+          <option>Erica dos Santos Justino</option>
+          <option>Erika Andrielley Belarquino dos Santos</option>
+          <option>Erivanda Lima dos Santos</option>
+          <option>Euzilene dos Reis Ferreira</option>
+          <option>Eva Major</option>
+          <option>Evanda dos Santos Oliveira</option>
+          <option>Evanilda de Fátima Sardinha da Silva</option>
+          <option>Fabiana Moreira Monção</option>
+          <option>Fabiana Saint Clair Silva</option>
+          <option>Fabiana de Azeredo Rangel</option>
+          <option>Fernanda Barreto de Oliveira Barros</option>
+          <option>Fernanda Cristina Pereira</option>
+          <option>Fernanda Cruz da Silva</option>
+          <option>Fernanda Fernandes Toledo</option>
+          <option>Fernanda Gomes Silva</option>
+          <option>Fernanda Ribeiro</option>
+          <option>Fernanda Sabrina Gomes Santos Moreira</option>
+          <option>Flaviane de Sá Sales</option>
+          <option>Flávia Carla Caetano de Almeida</option>
+          <option>Flávia da Conceição Moreira dos Santos</option>
+          <option>Flávia da Fonseca Carvalho</option>
+          <option>Francelly Silva Alvarenga</option>
+          <option>Francine Alvarenga Freitas</option>
+          <option>Francine da Silva Ferreira</option>
+          <option>Françoar Pereira Lima</option>
+          <option>Fátima Miranda de Barros</option>
+          <option>Gabriela Fernandes de Azevedo</option>
+          <option>Gabriela da Costa Basilio da Silva</option>
+          <option>Genayna Netto Caetano</option>
+          <option>Genilce Alves Magalhães Martinho</option>
+          <option>Geralda do Carmo Silva</option>
+          <option>Gesilane da Cruz Santos Silva</option>
+          <option>Gicelly Celestino Vieira Couto</option>
+          <option>Gilmara Gomes de Almeida</option>
+          <option>Gisela Castelo Branco</option>
+          <option>Gisele dos Santos Marcelo Satiro</option>
+          <option>Giselly Rangel Viana</option>
+          <option>Glaucia Maria dos Santos</option>
+          <option>Glecy Coutinho</option>
+          <option>Helaine da Silveira Macedo</option>
+          <option>Hiago de Souza</option>
+          <option>Iliana Costa Gonçalves Berenger</option>
+          <option>Inglet Rodrigues Miranda</option>
+          <option>Isabel Cristina Gomes Batista</option>
+          <option>Isis Lainne de Souza França</option>
+          <option>Italo Gomes de Oliveira</option>
+          <option>Ivana Márcia Barreto Rodrigues</option>
+          <option>Izabela Azevedo Viana</option>
+          <option>Izes Batista Medeiros</option>
+          <option>Janaína Maria Ribeiro de Almeida</option>
+          <option>Janete Alexandrino Barbosa Barreto</option>
+          <option>Janira Lima</option>
+          <option>Jeana Silva Costa</option>
+          <option>Jessica Lirio</option>
+          <option>Joana Bartolomeu Machado</option>
+          <option>Joiza Pereira Fernandes</option>
+          <option>Jorgina Crespo dos Santos</option>
+          <option>Josiane Pacheco Rangel de Mello</option>
+          <option>Josiani de Alvarenga</option>
+          <option>Josiely de Souza Rodrigues Correa</option>
+          <option>Josilma Nunes Ferreira Wolino</option>
+          <option>Josuete Pinto</option>
+          <option>Jovânia Martins Hazelmam Eccard</option>
+          <option>Joyce Fernandes de Souza Furriel</option>
+          <option>Joyce Monteiro Barroso</option>
+          <option>Julia da Silva Arêas Santana</option>
+          <option>Juliana Azevedo de Neto Souza</option>
+          <option>Juliana Cristina Rodrigues</option>
+          <option>Juliana Pereira Coutinho</option>
+          <option>Juliana Ramos Montes</option>
+          <option>Juliana Sant Ana de Carvalho</option>
+          <option>Juliana da Silva Santos</option>
+          <option>Jussara Barreto Caldas</option>
+          <option>Jussara Batista da Cruz</option>
+          <option>Jussara Ernesto Rodrigues Cordeiro</option>
+          <option>Jéssica Gomes dos Santos</option>
+          <option>Jéssica Lírio Fraga Areas Pinto</option>
+          <option>Karen Rangel da Costa</option>
+          <option>Karinny Cordeiro Valentim</option>
+          <option>Karla Machado</option>
+          <option>Keila Carvalho do Amaral</option>
+          <option>Kelli Silveira</option>
+          <option>Kelly Alves dos Santos</option>
+          <option>Kelly Avila da Silva</option>
+          <option>Kelly Cabral</option>
+          <option>Keyana Laudimio de Sousa Guedes</option>
+          <option>Kiokiaria Rangel Galdino</option>
+          <option>Krisiany Figueira Gomes Hinte de Souza</option>
+          <option>Kátia Gonçalves</option>
+          <option>Kátia Maciel de Oliveira</option>
+          <option>Lais Gomes de Souza</option>
+          <option>Lais dos Santos Rosário</option>
+          <option>Larissa da Silva Fonseca</option>
+          <option>Laudelina Helena de Souza Sá</option>
+          <option>Laura Jéssica Benvindo Viana Dias</option>
+          <option>Laura da Silva Souza</option>
+          <option>Layana da Gama Martins</option>
+          <option>Laís Robaina de Carvalho</option>
+          <option>Leandra Moreira Rodrigues</option>
+          <option>Leia Maria de Souza Tavares</option>
+          <option>Leidi Luci Soares Ribeiro</option>
+          <option>Leidia Monteiro de Azevedo</option>
+          <option>Leidilane Pereira Ribeiro</option>
+          <option>Leila Ribeiro de Souza Pinheiro</option>
+          <option>Lidiane Ferreira</option>
+          <option>Ligia Maria Martins</option>
+          <option>Ligia Maria Martins Gomes</option>
+          <option>Lilian Sierro</option>
+          <option>Liliane Pavoni Gonçalves</option>
+          <option>Livia Gama de Azeredo</option>
+          <option>Livia Maria Dumas Rego</option>
+          <option>Lohana dos Santos Donato</option>
+          <option>Lucas Boschoski</option>
+          <option>Lucas Gonçalves Lobo Ribeiro</option>
+          <option>Lucas Lourenço Cabral e Luciana Costa Cardozo da Silva</option>
+          <option>Luciana Cristina Ferreira da Silva</option>
+          <option>Luciana Nogueira Martinho Lopes</option>
+          <option>Luciana Paes de Lima</option>
+          <option>Luciana Paula Pinto Gomes</option>
+          <option>Luciana de Souza da Silva</option>
+          <option>Luciene Freitas Pinto de Carvalho</option>
+          <option>Luciene Souza Gomes</option>
+          <option>Lucimar da Silva Pereira Júnior</option>
+          <option>Lucinete Almeida Barcelos da Cruz Alves</option>
+          <option>Lucinilda Gonçalves Lobato</option>
+          <option>Luiza dos Santos Rodrigues</option>
+          <option>Luma da Silva Azevedo</option>
+          <option>Lutyene de Oliveira da Silva</option>
+          <option>Léa Almeida de Souza Silva</option>
+          <option>Lídia da Silva Neto Oliveira</option>
+          <option>Magda Cabral Ribeiro</option>
+          <option>Magna Freitas</option>
+          <option>Maiara Silva</option>
+          <option>Maiclley Ferreira Pereira</option>
+          <option>Maise Silvano Ribeiro</option>
+          <option>Manuela da Fonseca Rocha</option>
+          <option>Marcela da Conceição Santos</option>
+          <option>Marcele dos Santos</option>
+          <option>Marcelini Laura de Assis Silva</option>
+          <option>Marcelle Batista dos Santos Pessanha</option>
+          <option>Marcia Regina Pereira da Silva Louzada</option>
+          <option>Marcia Valeria Correa dos Santos da Silva</option>
+          <option>Marciana H. Nunes</option>
+          <option>Marciele Rangel dos Santos Pinheiro</option>
+          <option>Marenilse Regina Izodoro dos Santos</option>
+          <option>Margarete da Silva Montezuma</option>
+          <option>Maria Angela Barbosa Sant'ana</option>
+          <option>Maria Aparecida</option>
+          <option>Maria Cristina da Silva Alves Bonifácio</option>
+          <option>Maria Eduarda Alves Pereira Soares</option>
+          <option>Maria Helena de Almeida Nunes</option>
+          <option>Maria Josefa Pereira dos Santos</option>
+          <option>Maria Lorrana Barreto Gomes</option>
+          <option>Maria Lucia Figueira da Silva</option>
+          <option>Maria Luiza</option>
+          <option>Maria Luiza Soares Lobo</option>
+          <option>Maria Paula Albino Nunes</option>
+          <option>Maria da Penha da Silva Martins</option>
+          <option>Mariana de Souza Venancio</option>
+          <option>Mariele Andrade de Silva</option>
+          <option>Marilena Boa Morte Cordeiro Barboza</option>
+          <option>Marilene P. Vilaça da Silva</option>
+          <option>Marilene de Andrade da Silva</option>
+          <option>Marilucia Antonia P.damásio</option>
+          <option>Marilucia Queiroz da Conceição</option>
+          <option>Maristela da Silva Machado Albino</option>
+          <option>Marivalda Alves de Barros</option>
+          <option>Marize Tinoco Rogerio</option>
+          <option>Mariângela Rocha Pereira do Nascimento</option>
+          <option>Marlucia da Silva Peixoto Moreira</option>
+          <option>Marry Pessanha</option>
+          <option>Marta Antônia Miranda Vasconcelos</option>
+          <option>Marta Valéria Pereira</option>
+          <option>Marta Valéria Ribeiro dos Santos</option>
+          <option>Maryana Mota Joao</option>
+          <option>Mayaara Valadares Gonçalves</option>
+          <option>Mayara de Souza Rangel</option>
+          <option>Mayra Gomes dos Santos Freitas Lima e Joiza Pereira Fernandes</option>
+          <option>Maíra Alves Tavares</option>
+          <option>Merilane Rocha</option>
+          <option>Michelle Siqueira Azevedo</option>
+          <option>Mielle Pereira Rangel Viveiros</option>
+          <option>Milena Botelho da Silva</option>
+          <option>Milena da Silva de Almeida</option>
+          <option>Mirian Gomes Carvalho Soares</option>
+          <option>Mirian Pires Barbosa</option>
+          <option>Mirian Santiago Pessanha dos Reis</option>
+          <option>Mirian Tavares Gonçalves</option>
+          <option>Monica da Silva Arruda</option>
+          <option>Monicke Maia Knust</option>
+          <option>Monique Gomes Peixoto Mariante</option>
+          <option>Nadilla Gomes Tinoco</option>
+          <option>Naiara Gomes</option>
+          <option>Nathalia Cardozo do Nascimento</option>
+          <option>Nathalia Maria Rodrigues</option>
+          <option>Nathalia Rangel da Silva Sampaio</option>
+          <option>Natália Gomes Chagas</option>
+          <option>Neide de Oliveira Ribeiro</option>
+          <option>Neilda Maria Almeida de Souza</option>
+          <option>Nelma Rangel dos Santos</option>
+          <option>Nilza Won Helo de Souza Domiciano</option>
+          <option>Olga Maria Severiano</option>
+          <option>Pamela Ribeiro Andrade</option>
+          <option>Patricia Pereira Manhães</option>
+          <option>Patrícia Soares Fonseca</option>
+          <option>Patrícia Tavares Teixeira Lírio</option>
+          <option>Paula Cris Bernardina</option>
+          <option>Paula Regina Severino dos Santos</option>
+          <option>Paula de Azeredo Peixoto</option>
+          <option>Priscila Rangel</option>
+          <option>Priscila Tavares Terra Machado</option>
+          <option>Priscila Viana Alves</option>
+          <option>Priscila Viana Rangel</option>
+          <option>Priscila da Silva Geraldo</option>
+          <option>Priscila da Silveira Machado</option>
+          <option>Rachel Rodrigues Ribeiro</option>
+          <option>Raisa Pessanha Ribeiro</option>
+          <option>Raquel Toledo Ribeiro Moura</option>
+          <option>Raquel de Souza Nunes</option>
+          <option>Rayana Silva Ferreira Farinazo</option>
+          <option>Rayane Tinoco Monteiro</option>
+          <option>Regiane Gabriel de Andrade Barros</option>
+          <option>Regiane Peixoto de Barcellos</option>
+          <option>Rejane Rodrigues</option>
+          <option>Renata Aguiar Reis</option>
+          <option>Renata Ribeiro Carvalho Barreto</option>
+          <option>Renata Terra Penha Tavares</option>
+          <option>Renata Venancio dos Santos</option>
+          <option>Renata da Silva Mchado Leandro</option>
+          <option>Rita de Cássia Neto de Siqueira</option>
+          <option>Roberta Quintanilha Terra</option>
+          <option>Roberto Carlos da Silva</option>
+          <option>Rosalee da Silva Alves Viana</option>
+          <option>Rosana de Fátima Rocha de Freitas Guimarães</option>
+          <option>Rosane Carvalho</option>
+          <option>Rosilda Martins</option>
+          <option>Rosileia da Silva Cardoso</option>
+          <option>Sabrina Sobrinho Maravilha Gomes</option>
+          <option>Sandra Helena de S. B. Rodrigues</option>
+          <option>Sara Maria de Jesus Santos</option>
+          <option>Sheila Araujo Nogueira</option>
+          <option>Siderlane Correa Andre</option>
+          <option>Silva Coutinho</option>
+          <option>Silvana Costa de Abreu</option>
+          <option>Silvana da Conceição Carvalho</option>
+          <option>Silvia Marcia da Silva Fernandes Ramos</option>
+          <option>Silvia Roberta Crito Barcelos</option>
+          <option>Simone Barcelos Soares Barbosa</option>
+          <option>Simone Cristina Alves Vieira</option>
+          <option>Simone Cristina Magalhães Gomes</option>
+          <option>Simone Nunes Póvoa</option>
+          <option>Simone Ribeiro dos Santos Pessanha</option>
+          <option>Simone da Silva Sant'ana</option>
+          <option>Sirley Mara Jacometti Abreu</option>
+          <option>Stephanny Ribeiro Maciel</option>
+          <option>Suelen Leal de Souza</option>
+          <option>Sueli Gomes Crespo de Oliveira</option>
+          <option>Suzana Lacerda Rocha</option>
+          <option>Sônia Cristina Ribeiro Alves</option>
+          <option>Taiana Carla Dumas Trindade Pinheiro</option>
+          <option>Taina Firmino Santana</option>
+          <option>Taina Vieira Narcizo</option>
+          <option>Tania Márcia Rangel dos Santos Henriques</option>
+          <option>Tarcila Correa Cordeiro Andrade</option>
+          <option>Tatiana Almeida da Silva Monteiro</option>
+          <option>Tatiana Gomes</option>
+          <option>Tatiane Virgilio Vicente</option>
+          <option>Tays de Andrade</option>
+          <option>Telma Cristina Almeida do Desterro</option>
+          <option>Telma Monteiro Maciel</option>
+          <option>Tereza Maria Gomes Nogueira</option>
+          <option>Thalia de Oliveira Lima</option>
+          <option>Thamiris dos Santos Ribeeiro</option>
+          <option>Thayanne Fernanda de Souza Vieira</option>
+          <option>Thayna Barros Moreira Martins</option>
+          <option>Thays Celestino Tavares do Santos</option>
+          <option>Thaís Terra Ferreira</option>
+          <option>Tuane Trindade Machado Gomes</option>
+          <option>Tânia Regina Alves Barreto Gonçalves</option>
+          <option>Tânia Soares Ferras</option>
+          <option>Valdeíza da Conceição Silva</option>
+          <option>Valesca de Azevedo Aguiar Viana</option>
+          <option>Valéria Rabello dos Santos</option>
+          <option>Vanessa Antonino da Silva Wilemen Gomes</option>
+          <option>Vanessa Borges dos Santos</option>
+          <option>Vanessa Ribeiro Teixeira do Amaral</option>
+          <option>Vanessa dos Santos Carreira</option>
+          <option>Vania Maria Barbosa Tavares Rodrigues</option>
+          <option>Veronica de Almeida Correa</option>
+          <option>Veronica de Sa Azeredo Beles</option>
+          <option>Verônica Campos de Souza</option>
+          <option>Verônica Mathias Santos Siqueira</option>
+          <option>Verônica Rangel Francisco Barreto</option>
+          <option>Verônica da Silva Firmino</option>
+          <option>Verônica de Souza Gomes Mattos</option>
+          <option>Verônica dos Santos Ferreira Peixoto</option>
+          <option>Victoria Nilo Silva</option>
+          <option>Vitória Barcelos de Oliveira Souza</option>
+          <option>Vitória Gomes Eufrásio</option>
+          <option>Vânia Maria Alvarenga de Oliveira Barbosa</option>
+          <option>Weena Cherene Camara de Souza</option>
+          <option>Zenilda Santos do Nascimento</option>
+          <option>Átila de Oliveira Rocha</option>
+          <option>Élvia da Silva Pereira</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Cuidador</label>
+        <select id="cuidador">
+          <option value="">— selecione —</option>
+          <option>Adriana Barbosa Menezes</option>
+          <option>Adriana Barbosa da Conceição Rodrigues</option>
+          <option>Adriana Carvalho dos Santos</option>
+          <option>Adriana Ferreira Martins</option>
+          <option>Alessandra Isabel da Silva</option>
+          <option>Alessandra Martins Ribeiro</option>
+          <option>Alessandra Teixeira Claudio</option>
+          <option>Alessandra de Oliveira Sardinha Gomes</option>
+          <option>Alexandra Fernandes Cardoso</option>
+          <option>Aline Cristina Pereira dos Santos</option>
+          <option>Ana Beatriz Gomes Caldas Carvalho</option>
+          <option>Ana Cristina de Brito Oliveira</option>
+          <option>Ana Lucia Manhães Silva</option>
+          <option>Ana Léia Matias de Souza</option>
+          <option>Ana Maria Pereira Viana Gomes</option>
+          <option>Ana Patrícia dos Santos</option>
+          <option>Ana Paula Andrade da Silva</option>
+          <option>Ana Paula Gomes dos Santos Rodrigues</option>
+          <option>Ana Paula Irias Rangel Ribeiro</option>
+          <option>Ana Paula Maria Tavares Uhl da Silva</option>
+          <option>Ana Paula Pessanha Rangel de Oliveira</option>
+          <option>Ana Paula Silva</option>
+          <option>Ana Paula Souza</option>
+          <option>Ana Paula da Silva Pessanha</option>
+          <option>Andrea Pessanha de Souza</option>
+          <option>Andreia Gonzaga Ferreira</option>
+          <option>Andreia do Espirito Santo Lisboa</option>
+          <option>Andréa Barbosa Monteiro Cruz</option>
+          <option>Andréa Cristina Ernesto Rodrigues</option>
+          <option>Andréa Rodrigues dos Santos Fontana</option>
+          <option>Andréa de Castro Passos Leixas</option>
+          <option>Andréa de Sousa Francisco da Hora</option>
+          <option>Angela Cristina Batista de Souza Meireles</option>
+          <option>Angelica de Magalhães Cremonez</option>
+          <option>Angélica Honorato Tinoco da Silva</option>
+          <option>Ayandra Daniela de Sousa Conceição</option>
+          <option>Brigite Silva dos Santos Lemos</option>
+          <option>Bruna Cordeiro Barreto</option>
+          <option>Bruna de Oliveira Santana</option>
+          <option>Camila Soares da Silva Claudio</option>
+          <option>Carinny de Souza Honorato</option>
+          <option>Carla Gomes Francisco de Almeida</option>
+          <option>Carla Monteiro Paravidino</option>
+          <option>Carla da Silva Borges</option>
+          <option>Carolina Gomes de Jesus</option>
+          <option>Carolina Miguel Machado</option>
+          <option>Cassiane Cruz Pereira</option>
+          <option>Catarina Pinheiro de Oliviera Azeredo</option>
+          <option>Catia Helena Borges da Silva</option>
+          <option>Celene Teixeira Nascimento</option>
+          <option>Celita Galdino Carneiro</option>
+          <option>Celma Barreto Pereira Azeredo</option>
+          <option>Chistiany Costa Dias</option>
+          <option>Cintia Xavier Mendonça</option>
+          <option>Clarissa Ribeiro Gomes Leandro</option>
+          <option>Claudenice de Sousa Sales</option>
+          <option>Claudia Bernardo</option>
+          <option>Claudia Marcia Pereira de Medeiros</option>
+          <option>Claudinea Ignacio Guedes</option>
+          <option>Cláudia Marcia Maciel de Freitas Gomes</option>
+          <option>Cláudia Maria Barcellos de Souza Fideles</option>
+          <option>Cláudia Márcia Cardoso Miller</option>
+          <option>Crislani Paes da Silva</option>
+          <option>Cristiana Magalhães Rosa</option>
+          <option>Cristina Ribeiro Santana Olimpio</option>
+          <option>Cristina de Oliveira Francisco</option>
+          <option>Cátia Rangel dos Santos</option>
+          <option>Dalvânia do Carmo Ferreira</option>
+          <option>Damiani Aparecida Carvalho Contilho</option>
+          <option>Daniele Fernandes da Silva André</option>
+          <option>Daniele Ferreira</option>
+          <option>Danuzia Coelho Neto Belo</option>
+          <option>Dayana Silva Gomes</option>
+          <option>Dayane Cícero da Silva</option>
+          <option>Debora Alves dos Santos Rosario</option>
+          <option>Deisyanne da Costa Martins Belmiro</option>
+          <option>Deni Pessanha dos Santos Lopes</option>
+          <option>Denise da Conceição Rosa</option>
+          <option>Devanilda Monteiro da Silva</option>
+          <option>Edilene Vieira dos Santos Nascimento</option>
+          <option>Edilma Gomes de Souza</option>
+          <option>Edinea Azeredo Gomes</option>
+          <option>Edineia Nunes da Silva</option>
+          <option>Elaine Marta Raymundo de Carvalho</option>
+          <option>Elane Cristina Gomes Madeira</option>
+          <option>Eliana Ribeiro Amaral Tavares</option>
+          <option>Eliana dos Santos Ribeiro</option>
+          <option>Eliete de Souza Tavares Crespo</option>
+          <option>Elisa da Conceição Pereira</option>
+          <option>Elisangela Oliveira da Silva Moura</option>
+          <option>Elisângela Borges Ferreira</option>
+          <option>Elizabete Vieira dos Santos</option>
+          <option>Elizabeth Gomes da Silva Roa Vicente</option>
+          <option>Ellen Karla Fiuza Guilherme</option>
+          <option>Erica Cristina Miranda de Almeida</option>
+          <option>Erica Francisco de Azeredo Silva</option>
+          <option>Erivanda da Lima dos Santos</option>
+          <option>Euzinea Nogueira Lobo Faria</option>
+          <option>Evelyn Lillargem Talon</option>
+          <option>Fabiana Ribeiro Pessanha</option>
+          <option>Fabiana Ribeiro Venâncio</option>
+          <option>Fabiana de Souza Costa</option>
+          <option>Fabiane Gomes do Nascimento</option>
+          <option>Fernanda Gomes Barreto da Silva</option>
+          <option>Fernanda Luíza da Souza Rocha</option>
+          <option>Fernanda Santos de Oliveira Cordeiro</option>
+          <option>Flavia Cabral Gomes</option>
+          <option>Flávia Bastos Manhães</option>
+          <option>Flávia Jorge</option>
+          <option>Fátima Cristina Pereira de Araújo Viana</option>
+          <option>Gabriela Antonio dos Santos</option>
+          <option>Geisa Lidia Mateus de Abreu</option>
+          <option>Geisa dos Santos Antunes</option>
+          <option>Gilcemar da Silva Manhães</option>
+          <option>Gildivania de Vasconcelos Barreto</option>
+          <option>Gisele Pessanha Gomes Silva</option>
+          <option>Glauce Teixeira de Lima</option>
+          <option>Gracia Maria Coutinho Vieira</option>
+          <option>Graciane da Silva Porto</option>
+          <option>Graziela da Silva Alvarenga</option>
+          <option>Hakylla de Souza Manhães</option>
+          <option>Ingrid Carmo da Silva</option>
+          <option>Ingrid Mariano da Silva</option>
+          <option>Ingrid Pessanha de Souza</option>
+          <option>Iris Lane Pinto Marques</option>
+          <option>Irislaine Prado Crespo Gomes</option>
+          <option>Isabel Cristina Gomes Batista</option>
+          <option>Isabel de Oliveira Valoriote</option>
+          <option>Ivana Santos de Almeida</option>
+          <option>Izaias Barbosa da Conceição</option>
+          <option>Jailma da Silva Alves Melo</option>
+          <option>Jamili de Souza Monteiro</option>
+          <option>Janaina Gomes Pessanha dos Santos</option>
+          <option>Jane Kelly Gomes Madeira</option>
+          <option>Jaqueline Augusta Justino</option>
+          <option>Joana Darc Teixeira</option>
+          <option>Jocilea da Costa Ramos</option>
+          <option>Josiane Simão Fernandes</option>
+          <option>Josielen da Conceição Nogueira</option>
+          <option>Joyce da Silva Gomes</option>
+          <option>Joyce de Souza Costa</option>
+          <option>Juliana Helena Souza Manhães</option>
+          <option>Juliana Miranda Lima</option>
+          <option>Jéssica da Silva Gomes</option>
+          <option>Karla Machado do Nascimento</option>
+          <option>Karla Passos Ribeiro</option>
+          <option>Kelly Dumas da Silva Lemos</option>
+          <option>Kelly Pereira Rodrigues</option>
+          <option>Kelly Rodrigues Francisco</option>
+          <option>Kemylen Luiz Pessanha Pitote</option>
+          <option>Lailce Queiroga da Silva</option>
+          <option>Lais Gomes Muniz Sampaio</option>
+          <option>Laiz de Azevedo Cerqueira</option>
+          <option>Laura Honorato Alexandrina dos Santos</option>
+          <option>Leonora Rosa Cordeiro de Oliveira</option>
+          <option>Leticia Constancio de Araujo</option>
+          <option>Lilian Rangel Mauricio Caneca</option>
+          <option>Lilian da Silva Mesquita</option>
+          <option>Loana Santos Freixo Meireles</option>
+          <option>Lorena Almeida da Silva</option>
+          <option>Luany Lima Martins</option>
+          <option>Luciana da Silva Peixoto</option>
+          <option>Luciene de Sousa Coelho Pinto</option>
+          <option>Ludmila Nogueira Barbosa Cordeiro</option>
+          <option>Lusinete Elias do Nascimento</option>
+          <option>Lúcia Helena Pessanha Cabral</option>
+          <option>Manuela Egito Felizardo</option>
+          <option>Marcele Tereza Cordeiro Silva</option>
+          <option>Marcele da Silva Cruz</option>
+          <option>Marciane Lanes da Silva</option>
+          <option>Margarete de Lima Peixoto Souza</option>
+          <option>Maria Aparecida da Conceição Amaro</option>
+          <option>Maria Auxiliadora Esquef Maciel</option>
+          <option>Maria Eduarda Parente Ramos de Souza</option>
+          <option>Maria Helena Alves de Oliveira Abreu</option>
+          <option>Maria da Conceição Miranda Balbi</option>
+          <option>Maria das Dores Almeida da Silva</option>
+          <option>Mariangela Regina dos Santos</option>
+          <option>Mariangela Santana Ferreira Vieira</option>
+          <option>Marichelle Monteiro da Silva Rangel de Sousa</option>
+          <option>Marilandia Moreira dos Santos</option>
+          <option>Marilânia da Silva Quintanilha</option>
+          <option>Marize Pinto Soares</option>
+          <option>Marlene Garcia do Nascimento</option>
+          <option>Marvillin Fernanda Rocha Braga</option>
+          <option>Matheus de Souza Loureiro</option>
+          <option>Micheline das Chagas Ferreira</option>
+          <option>Michelly Borges Silvestre</option>
+          <option>Milena Rocha Costa</option>
+          <option>Márcia Cardoso da Silva</option>
+          <option>Márcia Luiza Soares</option>
+          <option>Márcia Valéria Neto de Alvarenga Gomes</option>
+          <option>Nadia Maria dos Santos Ribeiro Gomes</option>
+          <option>Nataliane Nogueira Rangel</option>
+          <option>Nataniele Rodrigues Pereira</option>
+          <option>Noel Costa Ribeiro</option>
+          <option>Nívea Junia Teixeira Rangel</option>
+          <option>Ozana Coimbra Henrique Monteiro</option>
+          <option>Patrícia Constancio do Espirito Santo Batista</option>
+          <option>Patrícia Vidal dos Santos</option>
+          <option>Patrícia da Silva Quintanilha</option>
+          <option>Paula Tavares Dias Soares</option>
+          <option>Priscila dos Santos Nogueira Rodrigues</option>
+          <option>Queite da Silva Venancio de Queiros</option>
+          <option>Ramon Crispin</option>
+          <option>Raquel Levino dos Santos</option>
+          <option>Rayane Gomes Carvalho</option>
+          <option>Rayane Oliveira de Sousa</option>
+          <option>Rayanne Pessanha da Silva</option>
+          <option>Regina Celia Mendes Ribeiro</option>
+          <option>Renata Alcantara Viana Alvarenga</option>
+          <option>Rita de Cassia Albernaz Pimentel</option>
+          <option>Romênia Roza da Silva Pereira</option>
+          <option>Rosa Maria Porto da Silva Soares</option>
+          <option>Rosana Beatriz Lirio</option>
+          <option>Rosane da Silva Quintanilha</option>
+          <option>Rosenilda Barreto Cruz</option>
+          <option>Rosenira Vianna Francisco</option>
+          <option>Rosiane dos Santos Bento</option>
+          <option>Rosimere Peixoto Francisco Alves</option>
+          <option>Rosimery Sa da Gama Ferreira</option>
+          <option>Sabrina do Nascimento Ribeiro</option>
+          <option>Salvadora Ribeiro Elias Bento</option>
+          <option>Sandra Maria Genasio de Souza</option>
+          <option>Sarah Lacerda da Fonseca</option>
+          <option>Sheila Ferreira Mendes Silva</option>
+          <option>Silvana Tavares de Azeredo</option>
+          <option>Silvia Marcia da Silva Fernandes Ramos</option>
+          <option>Sonia Maria Nascimento Francisco</option>
+          <option>Sonia Maria Nogueira dos Santos</option>
+          <option>Sueli Soares Silva</option>
+          <option>Suzette Fernandes Goulart da Silva</option>
+          <option>Suélen do Rosário da Silva Assis</option>
+          <option>Swellem Nunes dos Santos</option>
+          <option>Sônia Souza da Fonseca</option>
+          <option>Tatiana Manhães Crespo Ramos</option>
+          <option>Tatiana Pacheco</option>
+          <option>Tatiane Tavares Pereira Leobon</option>
+          <option>Teresa Cristina Santos de Oliveira Brochado</option>
+          <option>Tereza Cristina de Araújo Cabral Souza</option>
+          <option>Thalita Vieira Oiiveira dos Santos</option>
+          <option>Thamara Ribeiro Gomes</option>
+          <option>Tilma Fiuza Chagas</option>
+          <option>Vagner Rodrigues da Silva</option>
+          <option>Valdenice Santos da Silva</option>
+          <option>Valdinete Ataide do Nascimento Ribeiro</option>
+          <option>Vanda Lúcia Mota Ganda Machado</option>
+          <option>Vanessa Coelho da Costa</option>
+          <option>Vanessa Diogo da Silva</option>
+          <option>Vanessa da Silva Pedra</option>
+          <option>Vania Justino da Silva</option>
+          <option>Veronica de Freitas Crespo Aurora</option>
+          <option>Viviane Silva Cavalcante</option>
+          <option>Yasmim R. da Silva Sampaio</option>
+          <option>Zislene Ferreira Alves</option>
+          <option>Zuleica Silva Santos</option>
+          <option>Zélia Ribeiro da Silva</option>
+          <option>Érika Bernardino Moreira de Souza</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Sala de Recursos</label>
+        <select id="sala_recursos">
+          <option value="">— selecione —</option>
+          <option>Sim</option><option>Não</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Acompanhamento Institucional</label>
+        <select id="acompanhamento_inst">
+          <option value="">— selecione —</option>
+          <option>Sim</option><option>Não</option>
+        </select>
+      </div>
+      <div class="field span2">
+        <label>O Aluno Necessita de</label>
+        <div class="check-group" id="necessita_group">
+          <label class="check-item"><input type="checkbox" value="Mediação escolar"> Mediação escolar</label>
+          <label class="check-item"><input type="checkbox" value="Apoio psicopedagógico"> Apoio psicopedagógico</label>
+          <label class="check-item"><input type="checkbox" value="Intérprete de Libras"> Intérprete de Libras</label>
+          <label class="check-item"><input type="checkbox" value="Cuidador"> Cuidador</label>
+          <label class="check-item"><input type="checkbox" value="Sala de Recursos"> Sala de Recursos</label>
+          <label class="check-item"><input type="checkbox" value="Acompanhamento terapêutico"> Acompanhamento terapêutico</label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div class="actions">
+    <button type="button" class="btn-secondary" onclick="clearForm()">↺ Limpar</button>
+    <button type="submit" id="submitBtn" class="btn-primary">✚ Adicionar Registro</button>
+  </div>
+
+</form>
+
+<!-- TABELA -->
+<div class="card" style="max-width:860px;margin:2rem auto 1rem;">
+  <div class="card-header" style="justify-content:space-between;">
+    <span style="display:flex;align-items:center;gap:.5rem">Registros Adicionados</span>
+    <div class="search-wrap">
+      <span class="search-icon">⌕</span>
+      <input type="text" id="searchInput" class="search-input" placeholder="Buscar nome, CPF, escola, deficiência..." oninput="onSearch()">
+      <button class="search-clear" id="searchClear" onclick="clearSearch()" title="Limpar busca" style="display:none">✕</button>
+    </div>
+  </div>
+  <div id="tableArea">
+    <div class="empty-state">Nenhum registro adicionado ainda.</div>
+  </div>
+</div>
+
+<div class="actions" style="max-width:860px;margin:0 auto;">
+  <label class="btn-import" id="btnImport" title="Importar planilha Excel" style="display:none">
+    ⬆ Importar Excel
+    <input type="file" id="importFile" accept=".xlsx,.xls" style="display:none" onchange="importXLSX(this)">
+  </label>
+  <button class="btn-export" id="btnExport" onclick="exportXLSX()" style="display:none">⬇ Exportar para Excel</button>
+  <button class="btn-clear-all" onclick="clearAllRecords()" title="Limpar todos os registros do servidor" id="btnClearAll" style="display:none">🗑 Limpar Tudo</button>
+</div>
+
+<div id="toast">✓ Registro adicionado com sucesso!</div>
+
+<script>
+  // ── Auth ───────────────────────────────────────────
+  const USERS = {
+    'admin123': { role: 'admin', label: 'Administrador', escola: null },
+    'ce.29maio': { role: 'escola', label: 'CE 29 de Maio', escola: 'CE 29 de Maio', senha: '29@2025' },
+    // 'cem.aldeia': { role: 'escola', label: 'CEM Aldeia', escola: 'CEM Aldeia', senha: 'aldeia@2025' },
+    // 'cem.anabeatriz': { role: 'escola', label: 'CEM Ana Beatriz Rangel da Silva', escola: 'CEM Ana Beatriz Rangel da Silva', senha: 'ana@2025' },
+    // 'cem.anisio': { role: 'escola', label: 'CEM Anísio Spínola Teixeira', escola: 'CEM Anísio Spínola Teixeira', senha: 'ani@2025' },
+    // 'cem.antoninovena': { role: 'escola', label: 'CEM Antonino Venâncio', escola: 'CEM Antonino Venâncio', senha: 'antonino@2025' },
+    // 'cem.antonio': { role: 'escola', label: 'CEM Antônio Nunes Vieira', escola: 'CEM Antônio Nunes Vieira', senha: 'anto@2025' },
+    // 'cem.atalibacarvalho': { role: 'escola', label: 'CEM Ataliba Carvalho de Brito', escola: 'CEM Ataliba Carvalho de Brito', senha: 'ataliba@2025' },
+    // 'cem.lvaroribeiro': { role: 'escola', label: 'CEM Álvaro Ribeiro das Neves', escola: 'CEM Álvaro Ribeiro das Neves', senha: 'lvaro@2025' },
+    // 'cem.beiratai': { role: 'escola', label: 'CEM Beira do Taí', escola: 'CEM Beira do Taí', senha: 'beira@2025' },
+    // 'cem.beneditoalves': { role: 'escola', label: 'CEM Benedito Alves Barreto', escola: 'CEM Benedito Alves Barreto', senha: 'benedito@2025' },
+    // 'cem.brunosilva': { role: 'escola', label: 'CEM Bruno da Silva Macabu', escola: 'CEM Bruno da Silva Macabu', senha: 'bruno@2025' },
+    // 'cem.conceicimbe': { role: 'escola', label: 'CEM Conceição do Imbé', escola: 'CEM Conceição do Imbé', senha: 'conceic@2025' },
+    // 'cem.desembargadorsebastia': { role: 'escola', label: 'CEM Desembargador Sebastião Amaro da Silva Machado', escola: 'CEM Desembargador Sebastião Amaro da Silva Machado', senha: 'desembargador@2025' },
+    // 'cem.domanto': { role: 'escola', label: 'CEM Dom Antônio de Castro Mayer', escola: 'CEM Dom Antônio de Castro Mayer', senha: 'dom@2025' },
+    // 'cem.domhe': { role: 'escola', label: 'CEM Dom Hélder Câmara', escola: 'CEM Dom Hélder Câmara', senha: 'dom@2025' },
+    // 'cem.donana': { role: 'escola', label: 'CEM Donana', escola: 'CEM Donana', senha: 'donana@2025' },
+    // 'cem.felix': { role: 'escola', label: 'CEM Dr. Félix Miranda - inclusão 26', escola: 'CEM Dr. Félix Miranda - inclusão 26', senha: 'fe@2025' },
+    // 'cem.emidio': { role: 'escola', label: 'CEM Emídio Teixeira de Oliveira', escola: 'CEM Emídio Teixeira de Oliveira', senha: 'emi@2025' },
+    // 'cem.eneas': { role: 'escola', label: 'CEM Enéas Tavares Trindade', escola: 'CEM Enéas Tavares Trindade', senha: 'ene@2025' },
+    // 'cem.eriveltonjunior': { role: 'escola', label: 'CEM Erivelton Junior', escola: 'CEM Erivelton Junior', senha: 'erivelton@2025' },
+    // 'cem.farolsa': { role: 'escola', label: 'CEM Farol de São Thomé', escola: 'CEM Farol de São Thomé', senha: 'farol@2025' },
+    // 'cem.felismindomarques': { role: 'escola', label: 'CEM Felismindo Marques Barreto', escola: 'CEM Felismindo Marques Barreto', senha: 'felismindo@2025' },
+    // 'cem.franciscoalves': { role: 'escola', label: 'CEM Francisco Alves Dias', escola: 'CEM Francisco Alves Dias', senha: 'francisco@2025' },
+    // 'cem.franciscocordeiro': { role: 'escola', label: 'CEM Francisco Cordeiro Pereira', escola: 'CEM Francisco Cordeiro Pereira', senha: 'francisco@2025' },
+    // 'cem.franciscoassis': { role: 'escola', label: 'CEM Francisco de Assis', escola: 'CEM Francisco de Assis', senha: 'francisco@2025' },
+    // 'cem.gandurassed': { role: 'escola', label: 'CEM Gandur Assed', escola: 'CEM Gandur Assed', senha: 'gandur@2025' },
+    // 'cem.getulio': { role: 'escola', label: 'CEM Getúlio Vargas', escola: 'CEM Getúlio Vargas', senha: 'getu@2025' },
+    // 'cem.gilbertoespi': { role: 'escola', label: 'CEM Gilberto do Espírito Santo Amaral', escola: 'CEM Gilberto do Espírito Santo Amaral', senha: 'gilberto@2025' },
+    // 'cem.glicerio': { role: 'escola', label: 'CEM Glicério Carlos Neto', escola: 'CEM Glicério Carlos Neto', senha: 'glice@2025' },
+    // 'cem.grevisiqueira': { role: 'escola', label: 'CEM Grevi Siqueira', escola: 'CEM Grevi Siqueira', senha: 'grevi@2025' },
+    // 'cem.henriquejardim': { role: 'escola', label: 'CEM Henrique Jardim da Cruz', escola: 'CEM Henrique Jardim da Cruz', senha: 'henrique@2025' },
+    // 'cem.irmadulce': { role: 'escola', label: 'CEM Irmã Dulce', escola: 'CEM Irmã Dulce', senha: 'irma@2025' },
+    // 'cem.irmazilda': { role: 'escola', label: 'CEM Irmã Zilda', escola: 'CEM Irmã Zilda', senha: 'irma@2025' },
+    // 'cem.irmazilda1': { role: 'escola', label: 'CEM Irmã Zilda de Castro', escola: 'CEM Irmã Zilda de Castro', senha: 'irma@2025' },
+    // 'cem.jardimceasa': { role: 'escola', label: 'CEM Jardim Ceasa', escola: 'CEM Jardim Ceasa', senha: 'jardim@2025' },
+    // 'cem.joabatista': { role: 'escola', label: 'CEM João Batista Veiga', escola: 'CEM João Batista Veiga', senha: 'joa@2025' },
+    // 'cem.joagoulart': { role: 'escola', label: 'CEM João Goulart', escola: 'CEM João Goulart', senha: 'joa@2025' },
+    // 'cem.joaperdecene': { role: 'escola', label: 'CEM João Perdecene Neto', escola: 'CEM João Perdecene Neto', senha: 'joa@2025' },
+    // 'cem.joasiqueira': { role: 'escola', label: 'CEM João Siqueira dos Santos', escola: 'CEM João Siqueira dos Santos', senha: 'joa@2025' },
+    // 'cem.jocineiasilva': { role: 'escola', label: 'CEM Jocineia da Silva Borges', escola: 'CEM Jocineia da Silva Borges', senha: 'jocineia@2025' },
+    // 'cem.joseca': { role: 'escola', label: 'CEM José Cândido de Carvalho', escola: 'CEM José Cândido de Carvalho', senha: 'jose@2025' },
+    // 'cem.joseeduardo': { role: 'escola', label: 'CEM José Eduardo Peixoto Zandonaide', escola: 'CEM José Eduardo Peixoto Zandonaide', senha: 'jose@2025' },
+    // 'cem.josesilveira': { role: 'escola', label: 'CEM José Silveira Lubanco', escola: 'CEM José Silveira Lubanco', senha: 'jose@2025' },
+    // 'cem.josesouza': { role: 'escola', label: 'CEM José de Souza Sodre', escola: 'CEM José de Souza Sodre', senha: 'jose@2025' },
+    // 'cem.luizgonzaga': { role: 'escola', label: 'CEM Luiz Gonzaga da Silva', escola: 'CEM Luiz Gonzaga da Silva', senha: 'luiz@2025' },
+    // 'cem.madretereza': { role: 'escola', label: 'CEM Madre Tereza de Calcutá', escola: 'CEM Madre Tereza de Calcutá', senha: 'madre@2025' },
+    // 'cem.mariaconceic': { role: 'escola', label: 'CEM Maria da Conceição Santos Tavares', escola: 'CEM Maria da Conceição Santos Tavares', senha: 'maria@2025' },
+    // 'cem.marialourdes': { role: 'escola', label: 'CEM Maria de Lourdes', escola: 'CEM Maria de Lourdes', senha: 'maria@2025' },
+    // 'cem.martinluther': { role: 'escola', label: 'CEM Martin Luther King', escola: 'CEM Martin Luther King', senha: 'martin@2025' },
+    // 'cem.maflor': { role: 'escola', label: 'CEM Mãe Flor', escola: 'CEM Mãe Flor', senha: 'ma@2025' },
+    // 'cem.miriansantos': { role: 'escola', label: 'CEM Mirian dos Santos Melo', escola: 'CEM Mirian dos Santos Melo', senha: 'mirian@2025' },
+    // 'cem.monteirolobato': { role: 'escola', label: 'CEM Monteiro Lobato', escola: 'CEM Monteiro Lobato', senha: 'monteiro@2025' },
+    // 'cem.nadirpereira': { role: 'escola', label: 'CEM Nadir Pereira Gomes', escola: 'CEM Nadir Pereira Gomes', senha: 'nadir@2025' },
+    // 'cem.norbertosiqueira': { role: 'escola', label: 'CEM Norberto Siqueira Barreto', escola: 'CEM Norberto Siqueira Barreto', senha: 'norberto@2025' },
+    // 'cem.olimpio': { role: 'escola', label: 'CEM Olímpio Paulo da Silva', escola: 'CEM Olímpio Paulo da Silva', senha: 'oli@2025' },
+    // 'cem.parqueaurora': { role: 'escola', label: 'CEM Parque Aurora', escola: 'CEM Parque Aurora', senha: 'parque@2025' },
+    // 'cem.parqueguarus': { role: 'escola', label: 'CEM Parque Guarus', escola: 'CEM Parque Guarus', senha: 'parque@2025' },
+    // 'cem.parqueimperial': { role: 'escola', label: 'CEM Parque Imperial', escola: 'CEM Parque Imperial', senha: 'parque@2025' },
+    // 'cem.parqueprazeres': { role: 'escola', label: 'CEM Parque Prazeres', escola: 'CEM Parque Prazeres', senha: 'parque@2025' },
+    // 'cem.parquesantos': { role: 'escola', label: 'CEM Parque Santos Dumont', escola: 'CEM Parque Santos Dumont', senha: 'parque@2025' },
+    // 'cem.penha': { role: 'escola', label: 'CEM Penha', escola: 'CEM Penha', senha: 'penha@2025' },
+    // 'cem.paulofreire': { role: 'escola', label: 'CEM Prof. Paulo Freire', escola: 'CEM Prof. Paulo Freire', senha: 'paulo@2025' },
+    // 'cem.ngelamaria': { role: 'escola', label: 'CEM Prof.ª Ângela Maria do Amaral', escola: 'CEM Prof.ª Ângela Maria do Amaral', senha: 'ngela@2025' },
+    // 'cem.divamarina': { role: 'escola', label: 'CEM Prof.ª Diva Marina Suppa Goulart', escola: 'CEM Prof.ª Diva Marina Suppa Goulart', senha: 'diva@2025' },
+    // 'cem.joelmafigueiredo': { role: 'escola', label: 'CEM Prof.ª Joelma Figueiredo de Souza', escola: 'CEM Prof.ª Joelma Figueiredo de Souza', senha: 'joelma@2025' },
+    // 'cem.olgalinhares': { role: 'escola', label: 'CEM Prof.ª Olga Linhares Corrêa', escola: 'CEM Prof.ª Olga Linhares Corrêa', senha: 'olga@2025' },
+    // 'cem.ritaca': { role: 'escola', label: 'CEM Prof.ª Rita de Cássia Rocha Soares Chardelli', escola: 'CEM Prof.ª Rita de Cássia Rocha Soares Chardelli', senha: 'rita@2025' },
+    // 'cem.ruthchagas': { role: 'escola', label: 'CEM Prof.ª Ruth Chagas Manhães', escola: 'CEM Prof.ª Ruth Chagas Manhães', senha: 'ruth@2025' },
+    // 'cem.salvadorrangel': { role: 'escola', label: 'CEM Salvador Rangel Lopes', escola: 'CEM Salvador Rangel Lopes', senha: 'salvador@2025' },
+    // 'cem.samatheus': { role: 'escola', label: 'CEM São Matheus', escola: 'CEM São Matheus', senha: 'sa@2025' },
+    // 'cem.sebastiatavares': { role: 'escola', label: 'CEM Sebastião Tavares Campista', escola: 'CEM Sebastião Tavares Campista', senha: 'sebastia@2025' },
+    // 'cem.sergio': { role: 'escola', label: 'CEM Sérgio Luiz Lilico Paes da Silva', escola: 'CEM Sérgio Luiz Lilico Paes da Silva', senha: 'se@2025' },
+    // 'cem.silvinamanha': { role: 'escola', label: 'CEM Silvina Manhães Terra', escola: 'CEM Silvina Manhães Terra', senha: 'silvina@2025' },
+    // 'cem.subtenentecla': { role: 'escola', label: 'CEM Subtenente Cláudio Henrique Laurindo de Cravalho', escola: 'CEM Subtenente Cláudio Henrique Laurindo de Cravalho', senha: 'subtenente@2025' },
+    // 'cem.verapretyman': { role: 'escola', label: 'CEM Vera Pretyman', escola: 'CEM Vera Pretyman', senha: 'vera@2025' },
+    // 'cem.vereadorahermeny': { role: 'escola', label: 'CEM Vereadora Hermeny Coutinho', escola: 'CEM Vereadora Hermeny Coutinho', senha: 'vereadora@2025' },
+    // 'cem.wilsonamaro': { role: 'escola', label: 'CEM Wilson Amaro de Freitas', escola: 'CEM Wilson Amaro de Freitas', senha: 'wilson@2025' },
+    // 'cem.zumbipalmares': { role: 'escola', label: 'CEM Zumbi dos Palmares', escola: 'CEM Zumbi dos Palmares', senha: 'zumbi@2025' },
+    // 'escola.cemstiac': { role: 'escola', label: 'CEMSTIAC', escola: 'CEMSTIAC', senha: 'cemstiac@2025' },
+    // 'ciep.brizola142': { role: 'escola', label: 'CIEP Brizolão 142 Maestro Villa Lobos', escola: 'CIEP Brizolão 142 Maestro Villa Lobos', senha: 'brizola@2025' },
+    // 'ciep.brizola144': { role: 'escola', label: 'CIEP Brizolão 144 Prof.ª Carmem Sylvia Carneiro', escola: 'CIEP Brizolão 144 Prof.ª Carmem Sylvia Carneiro', senha: 'brizola@2025' },
+    // 'ciep.brizola269': { role: 'escola', label: 'CIEP Brizolão 269 Francisco Portela', escola: 'CIEP Brizolão 269 Francisco Portela', senha: 'brizola@2025' },
+    // 'ciep.brizola416': { role: 'escola', label: 'CIEP Brizolão 416 Wilson Batista', escola: 'CIEP Brizolão 416 Wilson Batista', senha: 'brizola@2025' },
+    // 'ciep.brizola481': { role: 'escola', label: 'CIEP Brizolão 481 Arnaldo Rosa Viana', escola: 'CIEP Brizolão 481 Arnaldo Rosa Viana', senha: 'brizola@2025' },
+    // 'em.apic': { role: 'escola', label: 'EM APIC', escola: 'EM APIC', senha: 'apic@2025' },
+    // 'em.alayrbernardes': { role: 'escola', label: 'EM Alayr Bernardes Pereira', escola: 'EM Alayr Bernardes Pereira', senha: 'alayr@2025' },
+    // 'em.albertinaazeredo': { role: 'escola', label: 'EM Albertina Azeredo Venâncio', escola: 'EM Albertina Azeredo Venâncio', senha: 'albertina@2025' },
+    // 'em.albertolamego': { role: 'escola', label: 'EM Alberto Lamego (Martins Lage)', escola: 'EM Alberto Lamego (Martins Lage)', senha: 'alberto@2025' },
+    // 'em.albertolamego1': { role: 'escola', label: 'EM Alberto Lamego (Poço Gordo)', escola: 'EM Alberto Lamego (Poço Gordo)', senha: 'alberto@2025' },
+    // 'em.alcebiades': { role: 'escola', label: 'EM Alcebíades Candiano', escola: 'EM Alcebíades Candiano', senha: 'alcebi@2025' },
+    // 'em.alfredovieira': { role: 'escola', label: 'EM Alfredo Vieira Machado', escola: 'EM Alfredo Vieira Machado', senha: 'alfredo@2025' },
+    // 'em.alicerio': { role: 'escola', label: 'EM Alicério Ribeiro da Silva', escola: 'EM Alicério Ribeiro da Silva', senha: 'alice@2025' },
+    // 'em.amaroanto': { role: 'escola', label: 'EM Amaro Antônio da Silva', escola: 'EM Amaro Antônio da Silva', senha: 'amaro@2025' },
+    // 'em.amaroprata': { role: 'escola', label: 'EM Amaro Prata Tavares', escola: 'EM Amaro Prata Tavares', senha: 'amaro@2025' },
+    // 'em.ambrosio': { role: 'escola', label: 'EM Ambrósio de Souza', escola: 'EM Ambrósio de Souza', senha: 'ambro@2025' },
+    // 'em.anleiferleite': { role: 'escola', label: 'EM Anleifer Leite Fernandes - Educação Especial', escola: 'EM Anleifer Leite Fernandes - Educação Especial', senha: 'anleifer@2025' },
+    // 'em.antonia': { role: 'escola', label: 'EM Antônia Lopes', escola: 'EM Antônia Lopes', senha: 'anto@2025' },
+    // 'em.antonio': { role: 'escola', label: 'EM Antônio Caetano Peixoto', escola: 'EM Antônio Caetano Peixoto', senha: 'anto@2025' },
+    // 'em.antonio1': { role: 'escola', label: 'EM Antônio Joaquim Codeço', escola: 'EM Antônio Joaquim Codeço', senha: 'anto@2025' },
+    // 'em.antonio2': { role: 'escola', label: 'EM Antônio de Souza Rodrigues', escola: 'EM Antônio de Souza Rodrigues', senha: 'anto@2025' },
+    // 'em.arybatista': { role: 'escola', label: 'EM Ary Batista Rangel', escola: 'EM Ary Batista Rangel', senha: 'ary@2025' },
+    // 'em.augustomachado': { role: 'escola', label: 'EM Augusto Machado Viana', escola: 'EM Augusto Machado Viana', senha: 'augusto@2025' },
+    // 'em.barreto': { role: 'escola', label: 'EM Barreto', escola: 'EM Barreto', senha: 'barreto@2025' },
+    // 'em.bartholomeulysandro': { role: 'escola', label: 'EM Bartholomeu Lysandro', escola: 'EM Bartholomeu Lysandro', senha: 'bartholomeu@2025' },
+    // 'em.brancapec': { role: 'escola', label: 'EM Branca Peçanha Ferreira', escola: 'EM Branca Peçanha Ferreira', senha: 'branca@2025' },
+    // 'em.california': { role: 'escola', label: 'EM Califórnia', escola: 'EM Califórnia', senha: 'califo@2025' },
+    // 'em.carloschagas': { role: 'escola', label: 'EM Carlos Chagas', escola: 'EM Carlos Chagas', senha: 'carlos@2025' },
+    // 'em.carlosjardim': { role: 'escola', label: 'EM Carlos Jardim da Cruz', escola: 'EM Carlos Jardim da Cruz', senha: 'carlos@2025' },
+    // 'em.claudia': { role: 'escola', label: 'EM Cláudia Almeida Pinto de Oliveira', escola: 'EM Cláudia Almeida Pinto de Oliveira', senha: 'cla@2025' },
+    // 'em.clovis': { role: 'escola', label: 'EM Clóvis Tavares', escola: 'EM Clóvis Tavares', senha: 'clo@2025' },
+    // 'em.conceicimbe': { role: 'escola', label: 'EM Conceição do Imbé', escola: 'EM Conceição do Imbé', senha: 'conceic@2025' },
+    // 'em.conselheirojosino': { role: 'escola', label: 'EM Conselheiro Josino', escola: 'EM Conselheiro Josino', senha: 'conselheiro@2025' },
+    // 'em.coronelanto': { role: 'escola', label: 'EM Coronel Antônio Batista', escola: 'EM Coronel Antônio Batista', senha: 'coronel@2025' },
+    // 'em.custodio': { role: 'escola', label: 'EM Custódio Generoso Vieira', escola: 'EM Custódio Generoso Vieira', senha: 'custo@2025' },
+    // 'em.custodio1': { role: 'escola', label: 'EM Custódio Siqueira', escola: 'EM Custódio Siqueira', senha: 'custo@2025' },
+    // 'em.donana': { role: 'escola', label: 'EM Donana', escola: 'EM Donana', senha: 'donana@2025' },
+    // 'em.alcindormoraes': { role: 'escola', label: 'EM Dr. Alcindor Moraes Bessa', escola: 'EM Dr. Alcindor Moraes Bessa', senha: 'alcindor@2025' },
+    // 'em.franciscomanoel': { role: 'escola', label: 'EM Dr. Francisco Manoel Pereira Crespo', escola: 'EM Dr. Francisco Manoel Pereira Crespo', senha: 'francisco@2025' },
+    // 'em.getulio': { role: 'escola', label: 'EM Dr. Getúlio Vargas', escola: 'EM Dr. Getúlio Vargas', senha: 'getu@2025' },
+    // 'em.luizguarana': { role: 'escola', label: 'EM Dr. Luiz Guaraná', escola: 'EM Dr. Luiz Guaraná', senha: 'luiz@2025' },
+    // 'em.luizsobral': { role: 'escola', label: 'EM Dr. Luiz Sobral Quadro de Educação Especial', escola: 'EM Dr. Luiz Sobral Quadro de Educação Especial', senha: 'luiz@2025' },
+    // 'em.eloyornelas': { role: 'escola', label: 'EM Eloy Ornelas', escola: 'EM Eloy Ornelas', senha: 'eloy@2025' },
+    // 'em.etelviramartins': { role: 'escola', label: 'EM Etelvira Martins Medeiros', escola: 'EM Etelvira Martins Medeiros', senha: 'etelvira@2025' },
+    // 'em.farolsa': { role: 'escola', label: 'EM Farol de São Tomé', escola: 'EM Farol de São Tomé', senha: 'farol@2025' },
+    // 'em.fazendaaleluia': { role: 'escola', label: 'EM Fazenda Aleluia', escola: 'EM Fazenda Aleluia', senha: 'fazenda@2025' },
+    // 'em.fazendachalita': { role: 'escola', label: 'EM Fazenda Chalita', escola: 'EM Fazenda Chalita', senha: 'fazenda@2025' },
+    // 'em.felicio': { role: 'escola', label: 'EM Felício Sarlo', escola: 'EM Felício Sarlo', senha: 'feli@2025' },
+    // 'em.ferroviario': { role: 'escola', label: 'EM Ferroviário Jacy da Silva Barbeto', escola: 'EM Ferroviário Jacy da Silva Barbeto', senha: 'ferrovia@2025' },
+    // 'em.franciscofaria': { role: 'escola', label: 'EM Francisco Faria Barbosa', escola: 'EM Francisco Faria Barbosa', senha: 'francisco@2025' },
+    // 'em.franciscoribeiro': { role: 'escola', label: 'EM Francisco Ribeiro Siqueira', escola: 'EM Francisco Ribeiro Siqueira', senha: 'francisco@2025' },
+    // 'em.franciscoricardo': { role: 'escola', label: 'EM Francisco Ricardo Lysandro de Albernaz Santos (KM 15)', escola: 'EM Francisco Ricardo Lysandro de Albernaz Santos (KM 15)', senha: 'francisco@2025' },
+    // 'em.franciscoricardo1': { role: 'escola', label: 'EM Francisco Ricardo Lysandro de Albernaz Santos (Mundéus)', escola: 'EM Francisco Ricardo Lysandro de Albernaz Santos (Mundéus)', senha: 'francisco@2025' },
+    // 'em.franciscoassis': { role: 'escola', label: 'EM Francisco de Assis - Sala de Recursos', escola: 'EM Francisco de Assis - Sala de Recursos', senha: 'francisco@2025' },
+    // 'em.fredericopaes': { role: 'escola', label: 'EM Frederico Paes Barbosa', escola: 'EM Frederico Paes Barbosa', senha: 'frederico@2025' },
+    // 'em.genesio': { role: 'escola', label: 'EM Genésio Viana', escola: 'EM Genésio Viana', senha: 'gene@2025' },
+    // 'em.gervasio': { role: 'escola', label: 'EM Gervásio Vasconcelos Cordeiro', escola: 'EM Gervásio Vasconcelos Cordeiro', senha: 'gerva@2025' },
+    // 'em.goncalo': { role: 'escola', label: 'EM Gonçalo Francisco Nunes', escola: 'EM Gonçalo Francisco Nunes', senha: 'gonc@2025' },
+    // 'em.guiomarramos': { role: 'escola', label: 'EM Guiomar Ramos Paes', escola: 'EM Guiomar Ramos Paes', senha: 'guiomar@2025' },
+    // 'em.heitoralves': { role: 'escola', label: 'EM Heitor Alves Barreto', escola: 'EM Heitor Alves Barreto', senha: 'heitor@2025' },
+    // 'em.helenamachado': { role: 'escola', label: 'EM Helena Machado de Oliveira', escola: 'EM Helena Machado de Oliveira', senha: 'helena@2025' },
+    // 'em.ignacio': { role: 'escola', label: 'EM Ignácio Corrêa dos Santos', escola: 'EM Ignácio Corrêa dos Santos', senha: 'igna@2025' },
+    // 'em.iniciacagri': { role: 'escola', label: 'EM Iniciação Agrícola José Francisco Mota Vasconcelos', escola: 'EM Iniciação Agrícola José Francisco Mota Vasconcelos', senha: 'iniciac@2025' },
+    // 'em.institutoprofissional': { role: 'escola', label: 'EM Instituto Profissional São José', escola: 'EM Instituto Profissional São José', senha: 'instituto@2025' },
+    // 'em.isabelmaria': { role: 'escola', label: 'EM Isabel Maria Polônio', escola: 'EM Isabel Maria Polônio', senha: 'isabel@2025' },
+    // 'em.jacquesricher': { role: 'escola', label: 'EM Jacques Richer', escola: 'EM Jacques Richer', senha: 'jacques@2025' },
+    // 'em.jardiminfa': { role: 'escola', label: 'EM Jardim de Infância Alva Doralice Ribeiro de Castro', escola: 'EM Jardim de Infância Alva Doralice Ribeiro de Castro', senha: 'jardim@2025' },
+    // 'em.joanirsanguedo': { role: 'escola', label: 'EM Joanir Sanguedo Boynard', escola: 'EM Joanir Sanguedo Boynard', senha: 'joanir@2025' },
+    // 'em.joabatista': { role: 'escola', label: 'EM João Batista de Azeredo', escola: 'EM João Batista de Azeredo', senha: 'joa@2025' },
+    // 'em.joaborges': { role: 'escola', label: 'EM João Borges Barreto', escola: 'EM João Borges Barreto', senha: 'joa@2025' },
+    // 'em.joacarlos': { role: 'escola', label: 'EM João Carlos de Castro', escola: 'EM João Carlos de Castro', senha: 'joa@2025' },
+    // 'em.joagoulart': { role: 'escola', label: 'EM João Goulart', escola: 'EM João Goulart', senha: 'joa@2025' },
+    // 'em.josecarneiro': { role: 'escola', label: 'EM José Carneiro Terra', escola: 'EM José Carneiro Terra', senha: 'jose@2025' },
+    // 'em.josegiro': { role: 'escola', label: 'EM José Giró Faisca', escola: 'EM José Giró Faisca', senha: 'jose@2025' },
+    // 'em.josemanoel': { role: 'escola', label: 'EM José Manoel da Silva', escola: 'EM José Manoel da Silva', senha: 'jose@2025' },
+    // 'em.josechagas': { role: 'escola', label: 'EM José das Chagas Pinto', escola: 'EM José das Chagas Pinto', senha: 'jose@2025' },
+    // 'em.joseanchieta': { role: 'escola', label: 'EM José de Anchieta', escola: 'EM José de Anchieta', senha: 'jose@2025' },
+    // 'em.joseazevedo': { role: 'escola', label: 'EM José de Azevedo', escola: 'EM José de Azevedo', senha: 'jose@2025' },
+    // 'em.josepatroci': { role: 'escola', label: 'EM José do Patrocínio', escola: 'EM José do Patrocínio', senha: 'jose@2025' },
+    // 'em.leandrosouza': { role: 'escola', label: 'EM Leandro de Souza Gomes', escola: 'EM Leandro de Souza Gomes', senha: 'leandro@2025' },
+    // 'em.leopoldinomaria': { role: 'escola', label: 'EM Leopoldino Maria', escola: 'EM Leopoldino Maria', senha: 'leopoldino@2025' },
+    // 'em.leoncio': { role: 'escola', label: 'EM Leôncio Pereira Gomes', escola: 'EM Leôncio Pereira Gomes', senha: 'leo@2025' },
+    // 'em.lionsgoitaca': { role: 'escola', label: 'EM Lions Goitacá_Educação Especial', escola: 'EM Lions Goitacá_Educação Especial', senha: 'lions@2025' },
+    // 'em.lions': { role: 'escola', label: 'EM Lions I ', escola: 'EM Lions I ', senha: 'lions@2025' },
+    // 'em.lionsii': { role: 'escola', label: 'EM Lions II', escola: 'EM Lions II', senha: 'lions@2025' },
+    // 'em.lidia': { role: 'escola', label: 'EM Lídia Leitão de Albernaz', escola: 'EM Lídia Leitão de Albernaz', senha: 'li@2025' },
+    // 'em.luiscarlos': { role: 'escola', label: 'EM Luis Carlos de Lacerda', escola: 'EM Luis Carlos de Lacerda', senha: 'luis@2025' },
+    // 'em.luizmonteiro': { role: 'escola', label: 'EM Luiz Monteiro Barbosa', escola: 'EM Luiz Monteiro Barbosa', senha: 'luiz@2025' },
+    // 'em.luloferreira': { role: 'escola', label: 'EM Lulo Ferreira de Araújo', escola: 'EM Lulo Ferreira de Araújo', senha: 'lulo@2025' },
+    // 'em.manoelcoelho': { role: 'escola', label: 'EM Manoel Coelho', escola: 'EM Manoel Coelho', senha: 'manoel@2025' },
+    // 'em.manoelcorre': { role: 'escola', label: 'EM Manoel Corrêa Gonçalves', escola: 'EM Manoel Corrêa Gonçalves', senha: 'manoel@2025' },
+    // 'em.manoelpereira': { role: 'escola', label: 'EM Manoel Pereira Gonçalves', escola: 'EM Manoel Pereira Gonçalves', senha: 'manoel@2025' },
+    // 'em.manoelribeiro': { role: 'escola', label: 'EM Manoel Ribeiro do Nascimento', escola: 'EM Manoel Ribeiro do Nascimento', senha: 'manoel@2025' },
+    // 'em.manoelsimo': { role: 'escola', label: 'EM Manoel Simões de Rezende', escola: 'EM Manoel Simões de Rezende', senha: 'manoel@2025' },
+    // 'em.marechalartur': { role: 'escola', label: 'EM Marechal Artur da Costa e Silva', escola: 'EM Marechal Artur da Costa e Silva', senha: 'marechal@2025' },
+    // 'em.mariaanto': { role: 'escola', label: 'EM Maria Antônia Pessanha Trindade', escola: 'EM Maria Antônia Pessanha Trindade', senha: 'maria@2025' },
+    // 'em.mariaarlete': { role: 'escola', label: 'EM Maria Arlete Azevedo Araújo', escola: 'EM Maria Arlete Azevedo Araújo', senha: 'maria@2025' },
+    // 'em.mariacordeiro': { role: 'escola', label: 'EM Maria Cordeiro Borges', escola: 'EM Maria Cordeiro Borges', senha: 'maria@2025' },
+    // 'em.marialu': { role: 'escola', label: 'EM Maria Lúcia', escola: 'EM Maria Lúcia', senha: 'maria@2025' },
+    // 'em.mariaqueiroz': { role: 'escola', label: 'EM Maria Queiroz de Oliveira', escola: 'EM Maria Queiroz de Oliveira', senha: 'maria@2025' },
+    // 'em.mariobarroso': { role: 'escola', label: 'EM Mario Barroso', escola: 'EM Mario Barroso', senha: 'mario@2025' },
+    // 'em.marlenehenriques': { role: 'escola', label: 'EM Marlene Henriques Alves', escola: 'EM Marlene Henriques Alves', senha: 'marlene@2025' },
+    // 'em.miguelhenrique': { role: 'escola', label: 'EM Miguel Henrique Gomes', escola: 'EM Miguel Henrique Gomes', senha: 'miguel@2025' },
+    // 'em.nacgoitaca': { role: 'escola', label: 'EM Nação Goitacá', escola: 'EM Nação Goitacá', senha: 'nac@2025' },
+    // 'em.nossasenhora': { role: 'escola', label: 'EM Nossa Senhora Aparecida', escola: 'EM Nossa Senhora Aparecida', senha: 'nossa@2025' },
+    // 'em.nossasenhora1': { role: 'escola', label: 'EM Nossa Senhora da Conceição', escola: 'EM Nossa Senhora da Conceição', senha: 'nossa@2025' },
+    // 'em.olavoalves': { role: 'escola', label: 'EM Olavo Alves Saldanha Filho', escola: 'EM Olavo Alves Saldanha Filho', senha: 'olavo@2025' },
+    // 'em.olimpio': { role: 'escola', label: 'EM Olímpio Honório de Almeida', escola: 'EM Olímpio Honório de Almeida', senha: 'oli@2025' },
+    // 'em.olimpio1': { role: 'escola', label: 'EM Olímpio Peixoto Sampaio', escola: 'EM Olímpio Peixoto Sampaio', senha: 'oli@2025' },
+    // 'em.pedrobarbosa': { role: 'escola', label: 'EM Pedro Barbosa', escola: 'EM Pedro Barbosa', senha: 'pedro@2025' },
+    // 'em.pequenofrederico': { role: 'escola', label: 'EM Pequeno Frederico', escola: 'EM Pequeno Frederico', senha: 'pequeno@2025' },
+    // 'em.pequenojornaleiro': { role: 'escola', label: 'EM Pequeno Jornaleiro', escola: 'EM Pequeno Jornaleiro', senha: 'pequeno@2025' },
+    // 'em.pontapalha': { role: 'escola', label: 'EM Ponta da Palha', escola: 'EM Ponta da Palha', senha: 'ponta@2025' },
+    // 'em.possemeio': { role: 'escola', label: 'EM Posse do Meio', escola: 'EM Posse do Meio', senha: 'posse@2025' },
+    // 'em.presidentecastelo': { role: 'escola', label: 'EM Presidente Castelo Branco', escola: 'EM Presidente Castelo Branco', senha: 'presidente@2025' },
+    // 'em.priscoalmeida': { role: 'escola', label: 'EM Prisco de Almeida', escola: 'EM Prisco de Almeida', senha: 'prisco@2025' },
+    // 'em.carlosbruno': { role: 'escola', label: 'EM Prof. Carlos Bruno', escola: 'EM Prof. Carlos Bruno', senha: 'carlos@2025' },
+    // 'em.darcyribeiro': { role: 'escola', label: 'EM Prof. Darcy Ribeiro', escola: 'EM Prof. Darcy Ribeiro', senha: 'darcy@2025' },
+    // 'em.fernandoandrade': { role: 'escola', label: 'EM Prof. Fernando de Andrade', escola: 'EM Prof. Fernando de Andrade', senha: 'fernando@2025' },
+    // 'em.paulofreire': { role: 'escola', label: 'EM Prof. Paulo Freire', escola: 'EM Prof. Paulo Freire', senha: 'paulo@2025' },
+    // 'em.waltersiqueira': { role: 'escola', label: 'EM Prof. Walter Siqueira', escola: 'EM Prof. Walter Siqueira', senha: 'walter@2025' },
+    // 'em.eleonorasilva': { role: 'escola', label: 'EM Prof.ª Eleonora Silva Pinto Viana', escola: 'EM Prof.ª Eleonora Silva Pinto Viana', senha: 'eleonora@2025' },
+    // 'em.eunicia': { role: 'escola', label: 'EM Prof.ª Eunícia Ferreira da Silva', escola: 'EM Prof.ª Eunícia Ferreira da Silva', senha: 'euni@2025' },
+    // 'em.mariangela': { role: 'escola', label: 'EM Prof.ª Maria Ângela Moreira Pinto', escola: 'EM Prof.ª Maria Ângela Moreira Pinto', senha: 'maria@2025' },
+    // 'em.olgalinhares': { role: 'escola', label: 'EM Prof.ª Olga Linhares Correa', escola: 'EM Prof.ª Olga Linhares Correa', senha: 'olga@2025' },
+    // 'em.wilmarcava': { role: 'escola', label: 'EM Prof.ª Wilmar Cava Barros', escola: 'EM Prof.ª Wilmar Cava Barros', senha: 'wilmar@2025' },
+    // 'em.raymundosoares': { role: 'escola', label: 'EM Raymundo Soares Filho', escola: 'EM Raymundo Soares Filho', senha: 'raymundo@2025' },
+    // 'em.rotary': { role: 'escola', label: 'EM Rotary I', escola: 'EM Rotary I', senha: 'rotary@2025' },
+    // 'em.sagradafami': { role: 'escola', label: 'EM Sagrada Família', escola: 'EM Sagrada Família', senha: 'sagrada@2025' },
+    // 'em.salvadorbenzi': { role: 'escola', label: 'EM Salvador Benzi', escola: 'EM Salvador Benzi', senha: 'salvador@2025' },
+    // 'em.santaba': { role: 'escola', label: 'EM Santa Bárbara', escola: 'EM Santa Bárbara', senha: 'santa@2025' },
+    // 'em.santamaria': { role: 'escola', label: 'EM Santa Maria', escola: 'EM Santa Maria', senha: 'santa@2025' },
+    // 'em.santarita': { role: 'escola', label: 'EM Santa Rita de Cássia', escola: 'EM Santa Rita de Cássia', senha: 'santa@2025' },
+    // 'em.santaterezinha': { role: 'escola', label: 'EM Santa Terezinha', escola: 'EM Santa Terezinha', senha: 'santa@2025' },
+    // 'em.santoamaro': { role: 'escola', label: 'EM Santo Amaro', escola: 'EM Santo Amaro', senha: 'santo@2025' },
+    // 'em.santoanto': { role: 'escola', label: 'EM Santo Antônio', escola: 'EM Santo Antônio', senha: 'santo@2025' },
+    // 'em.sebastiaribeiro': { role: 'escola', label: 'EM Sebastião Ribeiro de Deus', escola: 'EM Sebastião Ribeiro de Deus', senha: 'sebastia@2025' },
+    // 'em.sebastiaviveiros': { role: 'escola', label: 'EM Sebastião Viveiros de Vasconcelos', escola: 'EM Sebastião Viveiros de Vasconcelos', senha: 'sebastia@2025' },
+    // 'em.senadorjose': { role: 'escola', label: 'EM Senador José Carlos Pereira Pinto', escola: 'EM Senador José Carlos Pereira Pinto', senha: 'senador@2025' },
+    // 'em.senadortarci': { role: 'escola', label: 'EM Senador Tarcísio Miranda', escola: 'EM Senador Tarcísio Miranda', senha: 'senador@2025' },
+    // 'em.sesmaria': { role: 'escola', label: 'EM Sesmaria', escola: 'EM Sesmaria', senha: 'sesmaria@2025' },
+    // 'em.sergio': { role: 'escola', label: 'EM Sérgio Viana Barroso', escola: 'EM Sérgio Viana Barroso', senha: 'se@2025' },
+    // 'em.tarcilio': { role: 'escola', label: 'EM Tarcílio Siqueira Cordeiro', escola: 'EM Tarcílio Siqueira Cordeiro', senha: 'tarci@2025' },
+    // 'em.thierryhomero': { role: 'escola', label: 'EM Thierry Homero Ribeiro Gomes', escola: 'EM Thierry Homero Ribeiro Gomes', senha: 'thierry@2025' },
+  };
+
+  let currentRole   = null;
+  let currentSchool = null; // escola do usuário logado (null = vê tudo)
+
+  function togglePassword() {
+    const input = document.getElementById('loginInput');
+    const btn   = document.getElementById('togglePwd');
+    const show  = input.type === 'password';
+    input.type  = show ? 'text' : 'password';
+    btn.textContent = show ? '🙈' : '👁';
+    input.focus();
+  }
+
+  async function doLogin() {
+    const user = document.getElementById('loginUser').value.trim();
+    const pwd  = document.getElementById('loginInput').value;
+
+    // Admin usa só senha (campo usuário ignorado se senha bater)
+    let userObj = null;
+    if (pwd === 'admin123') {
+      userObj = USERS['admin123'];
+    } else {
+      const entry = USERS[user];
+      if (entry && entry.senha === pwd) userObj = entry;
+    }
+
+    if (!userObj) {
+      document.getElementById('loginError').classList.add('show');
+      document.getElementById('loginInput').value = '';
+      document.getElementById('loginInput').focus();
+      return;
+    }
+
+    currentRole   = userObj.role;
+    currentSchool = userObj.escola;
+
+    document.getElementById('loginOverlay').style.display = 'none';
+    document.getElementById('userLabel').textContent = userObj.label;
+    document.getElementById('loginUser').value  = '';
+    document.getElementById('loginInput').value = '';
+    document.getElementById('loginError').classList.remove('show');
+
+    showToast('⏳ Carregando dados...');
+    await loadFromServer();
+    const isAdmin = currentRole === 'admin';
+    document.getElementById('btnClearAll').style.display = isAdmin ? 'flex' : 'none';
+    document.getElementById('btnImport').style.display   = isAdmin ? 'flex' : 'none';
+    document.getElementById('btnExport').style.display   = isAdmin ? 'flex' : 'none';
+
+    // Se for usuário de escola, preenche e bloqueia o campo unidade_escolar
+    const selectEscola = document.getElementById('unidade_escolar');
+    if (currentSchool) {
+      selectEscola.value    = currentSchool;
+      selectEscola.disabled = true;
+    } else {
+      selectEscola.disabled = false; // admin pode selecionar qualquer escola
+    }
+
+    renderTable();
+  }
+
+  function doLogout() {
+    currentRole   = null;
+    currentSchool = null;
+    records = [];
+    document.getElementById('loginOverlay').style.display = 'flex';
+    document.getElementById('loginUser').value  = '';
+    document.getElementById('loginInput').value = '';
+    document.getElementById('loginUser').focus();
+    document.getElementById('btnClearAll').style.display = 'none';
+    document.getElementById('btnImport').style.display   = 'none';
+    document.getElementById('btnExport').style.display   = 'none';
+    const selectEscola = document.getElementById('unidade_escolar');
+    selectEscola.value    = '';
+    selectEscola.disabled = true;
+    document.getElementById('tableArea').innerHTML = '<div class="empty-state">Nenhum registro adicionado ainda.</div>';
+  }
+
+  // ── State ──────────────────────────────────────────
+  let records = [];
+  let editIndex = null;
+  let currentPage = 1;
+  let perPage = 20;
+  let searchQuery = '';
+
+  const COLS = [
+    { key: 'num',               label: 'ID' },
+    { key: 'unidade_escolar',   label: 'Unidade Escolar' },
+    { key: 'cpf',               label: 'CPF' },
+    { key: 'aluno',             label: 'Aluno' },
+    { key: 'data_nascimento',   label: 'Data Nasc.' },
+    { key: 'sexo',              label: 'Sexo' },
+    { key: 'ordem_judicial',    label: 'Ordem Judicial' },
+    { key: 'ano_escolaridade',  label: 'Ano Escolaridade' },
+    { key: 'turno',             label: 'Turno' },
+    { key: 'ano_laudo',         label: 'Ano Laudo' },
+    { key: 'tipo_deficiencia',  label: 'Tipo Deficiência' },
+    { key: 'caso_severo',       label: 'Caso Severo' },
+    { key: 'mediador',          label: 'Mediador' },
+    { key: 'cuidador',          label: 'Cuidador' },
+    { key: 'sala_recursos',     label: 'Sala Recursos' },
+    { key: 'acompanhamento_inst', label: 'Acomp. Inst.' },
+    { key: 'necessita',         label: 'Necessita' },
+    { key: 'investigacao',      label: 'Situação' },
+  ];
+
+  // ── CPF mask ───────────────────────────────────────
+  document.getElementById('cpf').addEventListener('input', function () {
+    let v = this.value.replace(/\D/g, '').slice(0, 11);
+    if (v.length > 9) v = v.replace(/(\d{3})(\d{3})(\d{3})(\d{1,2})/, '$1.$2.$3-$4');
+    else if (v.length > 6) v = v.replace(/(\d{3})(\d{3})(\d{1,3})/, '$1.$2.$3');
+    else if (v.length > 3) v = v.replace(/(\d{3})(\d{1,3})/, '$1.$2');
+    this.value = v;
+  });
+
+  // ── JSONBin.io ─────────────────────────────────────
+  const JSONBIN_KEY = '$2a$10$UysIHXuZc3gSJiGlA..wruUCvTHTiHK7C9XVm5QHOAMGqV/ue2PFi';
+  let BIN_ID = '69d8ef25856a6821891bc936';
+
+  async function loadFromServer() {
+    if (!BIN_ID) return; // bin ainda não criado
+    try {
+      const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
+        headers: { 'X-Master-Key': JSONBIN_KEY }
+      });
+      const data = await res.json();
+      records = data.record.records || [];
+    } catch (e) {
+      console.error('Erro ao carregar dados:', e);
+    }
+  }
+
+  async function saveToServer() {
+    const body = JSON.stringify({ records });
+    try {
+      if (!BIN_ID) {
+        // Cria o bin na primeira vez
+        const res = await fetch('https://api.jsonbin.io/v3/b', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Master-Key': JSONBIN_KEY,
+            'X-Bin-Name': 'quadro-nee',
+            'X-Bin-Private': 'true'
+          },
+          body
+        });
+        const data = await res.json();
+        BIN_ID = data.metadata.id;
+      } else {
+        await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Master-Key': JSONBIN_KEY
+          },
+          body
+        });
+      }
+    } catch (e) {
+      console.error('Erro ao salvar dados:', e);
+      showToast('⚠ Erro ao salvar no servidor.');
+    }
+  }
+
+  // ── Gera ID automático ─────────────────────────────
+  function generateId() {
+    const year = new Date().getFullYear();
+    const seq  = records.length + 1;
+    return `NEE-${year}-${String(seq).padStart(4, '0')}`;
+  }
+
+  // ── Form submit ────────────────────────────────────
+  document.getElementById('neeForm').addEventListener('submit', async function (e) {
+    e.preventDefault();
+
+    const necessita = [...document.querySelectorAll('#necessita_group input:checked')]
+      .map(cb => cb.value).join('; ');
+
+    const row = {};
+    COLS.forEach(c => {
+      if (c.key === 'necessita') {
+        row[c.key] = necessita;
+      } else {
+        const el = document.getElementById(c.key);
+        row[c.key] = el ? el.value : '';
+      }
+    });
+
+    if (editIndex !== null) {
+      // Mantém o ID original ao editar
+      row.num = records[editIndex].num;
+      records[editIndex] = row;
+      editIndex = null;
+      document.getElementById('submitBtn').textContent = '✚ Adicionar Registro';
+      document.getElementById('neeForm').classList.remove('editing-mode');
+      showToast('✏ Registro atualizado com sucesso!');
+    } else {
+      // Gera novo ID automaticamente
+      row.num = generateId();
+      records.push(row);
+      currentPage = Math.ceil(records.length / perPage);
+      showToast('✓ Registro salvo com sucesso!');
+    }
+
+    renderTable();
+    clearForm();
+    await saveToServer();
+  });
+
+  // ── Render table ───────────────────────────────────
+  function renderTable() {
+    const area = document.getElementById('tableArea');
+
+    // Filtra por escola do usuário logado (se aplicável)
+    const schoolFiltered = currentSchool
+      ? records.filter(r => r.unidade_escolar === currentSchool)
+      : records;
+
+    // Filtra registros conforme busca
+    const q = searchQuery.trim().toLowerCase();
+    const searchKeys = ['num','aluno','cpf','unidade_escolar','tipo_deficiencia','turno','investigacao','mediador','cuidador'];
+    const filtered = q
+      ? schoolFiltered.filter(r => searchKeys.some(k => (r[k] || '').toLowerCase().includes(q)))
+      : schoolFiltered;
+
+    if (records.length === 0) {
+      area.innerHTML = '<div class="empty-state">Nenhum registro adicionado ainda.</div>';
+      return;
+    }
+    if (filtered.length === 0 && !q) {
+      area.innerHTML = `<div class="empty-state">Nenhum registro encontrado para <strong>${currentSchool}</strong>.</div>`;
+      return;
+    }
+    if (filtered.length === 0) {
+      area.innerHTML = `<div class="empty-state">Nenhum resultado para "<strong>${q}</strong>".</div>`;
+      return;
+    }
+
+    const totalPages = Math.ceil(filtered.length / perPage);
+    if (currentPage > totalPages) currentPage = totalPages;
+    const start = (currentPage - 1) * perPage;
+    const pageRecords = filtered.slice(start, start + perPage);
+
+    // Função para destacar o termo buscado no texto
+    function hl(text) {
+      if (!q) return text;
+      const escaped = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      return String(text).replace(new RegExp(`(${escaped})`, 'gi'), '<mark class="hl">$1</mark>');
+    }
+
+    const visibleCols = ['num', 'aluno', 'unidade_escolar', 'tipo_deficiencia', 'turno', 'investigacao'];
+    const colWidths = {
+      num: '120px', aluno: '22%', unidade_escolar: '20%',
+      tipo_deficiencia: '20%', turno: '70px', investigacao: '90px',
+    };
+
+    let html = '<div class="table-wrap"><table style="table-layout:fixed;width:100%"><thead><tr>';
+    visibleCols.forEach(k => {
+      const col = COLS.find(c => c.key === k);
+      html += `<th style="width:${colWidths[k]}">${col ? col.label : k}</th>`;
+    });
+    html += '<th style="width:90px">Ações</th></tr></thead><tbody>';
+
+    pageRecords.forEach((r, pi) => {
+      // índice real no array original (para editar/excluir corretamente)
+      const i = records.indexOf(r);
+      html += '<tr>';
+      visibleCols.forEach(k => {
+        let val = r[k] || '—';
+        const tdClass = k === 'investigacao' ? ' class="col-investigacao"' : '';
+        if (k === 'investigacao' || k === 'caso_severo' || k === 'ordem_judicial') {
+          const display = k === 'investigacao' && val === 'Em investigação estudo' ? 'Estudo' : val;
+          const cls = val === 'Sim' || val === 'Com laudo' ? 'badge-yes' : 'badge-no';
+          val = `<span class="badge ${cls}" title="${val}">${hl(display)}</span>`;
+        } else if (k === 'num') {
+          val = `<span style="font-size:.7rem;font-family:'JetBrains Mono',monospace;white-space:nowrap;">${val}</span>`;
+        } else if (['aluno','unidade_escolar','tipo_deficiencia'].includes(k)) {
+          val = `<span title="${r[k]||''}" style="display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${hl(val)}</span>`;
+        } else {
+          val = hl(val);
+        }
+        html += `<td${tdClass} style="overflow:hidden;max-width:0">${val}</td>`;
+      });
+      const editBtn = `<button class="edit-btn" title="Editar registro" onclick="editRecord(${i})">✏</button>`;
+      const delBtn  = currentRole === 'admin'
+        ? `<button class="del-btn" title="Excluir registro" onclick="removeRecord(${i})">✕</button>`
+        : '';
+      html += `<td style="white-space:nowrap">${editBtn}${delBtn}</td>`;
+      html += '</tr>';
+    });
+
+    html += '</tbody></table></div>';
+
+    // Paginação
+    const from = start + 1;
+    const to   = Math.min(start + perPage, filtered.length);
+    const info = q
+      ? `${filtered.length} resultado(s) para "${q}" · Exibindo ${from}–${to}`
+      : `Exibindo ${from}–${to} de ${records.length} registros`;
+
+    html += `<div class="pagination">
+      <div style="display:flex;align-items:center;gap:.75rem">
+        <span class="pagination-info">${info}</span>
+        <select class="per-page-select" onchange="changePerPage(this.value)" title="Registros por página">
+          <option value="20" ${perPage===20?'selected':''}>20 / pág</option>
+          <option value="30" ${perPage===30?'selected':''}>30 / pág</option>
+          <option value="50" ${perPage===50?'selected':''}>50 / pág</option>
+          <option value="100" ${perPage===100?'selected':''}>100 / pág</option>
+        </select>
+      </div>
+      <div class="pagination-controls">
+        <button class="page-btn" onclick="goPage(1)" ${currentPage===1?'disabled':''}>«</button>
+        <button class="page-btn" onclick="goPage(${currentPage-1})" ${currentPage===1?'disabled':''}>‹</button>`;
+
+    const delta = 2;
+    let pStart = Math.max(1, currentPage - delta);
+    let pEnd   = Math.min(totalPages, currentPage + delta);
+    if (pEnd - pStart < 4) { pStart = Math.max(1, pEnd - 4); pEnd = Math.min(totalPages, pStart + 4); }
+    for (let p = pStart; p <= pEnd; p++) {
+      html += `<button class="page-btn ${p===currentPage?'active':''}" onclick="goPage(${p})">${p}</button>`;
+    }
+    html += `<button class="page-btn" onclick="goPage(${currentPage+1})" ${currentPage===totalPages?'disabled':''}>›</button>
+        <button class="page-btn" onclick="goPage(${totalPages})" ${currentPage===totalPages?'disabled':''}>»</button>
+      </div></div>`;
+
+    area.innerHTML = html;
+  }
+
+  // ── Search ──────────────────────────────────────────
+  function onSearch() {
+    searchQuery = document.getElementById('searchInput').value;
+    document.getElementById('searchClear').style.display = searchQuery ? 'block' : 'none';
+    currentPage = 1;
+    renderTable();
+  }
+
+  function clearSearch() {
+    searchQuery = '';
+    document.getElementById('searchInput').value = '';
+    document.getElementById('searchClear').style.display = 'none';
+    currentPage = 1;
+    renderTable();
+    document.getElementById('searchInput').focus();
+  }
+
+  function goPage(p) {
+    const q = searchQuery.trim().toLowerCase();
+    const searchKeys = ['num','aluno','cpf','unidade_escolar','tipo_deficiencia','turno','investigacao','mediador','cuidador'];
+    const filtered = q ? records.filter(r => searchKeys.some(k => (r[k]||'').toLowerCase().includes(q))) : records;
+    const totalPages = Math.ceil(filtered.length / perPage);
+    currentPage = Math.max(1, Math.min(p, totalPages));
+    renderTable();
+  }
+
+  function changePerPage(val) {
+    perPage = parseInt(val);
+    currentPage = 1;
+    renderTable();
+  }
+
+  async function removeRecord(i) {
+    records.splice(i, 1);
+    renderTable();
+    await saveToServer();
+    showToast('🗑 Registro excluído.');
+  }
+
+  async function clearAllRecords() {
+    if (!confirm(`Tem certeza que deseja apagar TODOS os ${records.length} registro(s)?\n\nEssa ação não pode ser desfeita.`)) return;
+    records = [];
+    currentPage = 1;
+    renderTable();
+    await saveToServer();
+    showToast('🗑 Todos os registros foram removidos.');
+  }
+
+  function editRecord(i) {
+    const r = records[i];
+    editIndex = i;
+
+    // Preenche todos os campos do formulário
+    COLS.forEach(c => {
+      if (c.key === 'necessita') {
+        // Desmarca todos e marca os corretos
+        document.querySelectorAll('#necessita_group input[type="checkbox"]').forEach(cb => {
+          cb.checked = (r.necessita || '').split('; ').includes(cb.value);
+        });
+      } else {
+        const el = document.getElementById(c.key);
+        if (el) el.value = r[c.key] || '';
+      }
+    });
+
+    // Atualiza bloqueio de mediador/cuidador conforme situação
+    onSituacaoChange();
+
+    // Atualiza botão e destaque visual
+    document.getElementById('submitBtn').textContent = '💾 Salvar Alterações';
+    document.getElementById('neeForm').classList.add('editing-mode');
+
+    // Rola até o formulário
+    document.getElementById('neeForm').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  // ── Situação → bloqueia campos se "Estudo" (só para usuário escola) ──
+  function onSituacaoChange() {
+    if (currentRole === 'admin') return; // admin sem restrições
+    const isEstudo = document.getElementById('investigacao').value === 'Estudo';
+    const blocked = ['mediador', 'cuidador', 'tipo_deficiencia', 'ano_laudo'];
+    blocked.forEach(id => {
+      const el = document.getElementById(id);
+      if (isEstudo) {
+        el.value    = '';
+        el.disabled = true;
+      } else {
+        el.disabled = false;
+      }
+    });
+  }
+
+  // ── Clear form ─────────────────────────────────────
+  function clearForm() {
+    document.getElementById('neeForm').reset();
+    editIndex = null;
+    document.getElementById('submitBtn').textContent = '✚ Adicionar Registro';
+    document.getElementById('neeForm').classList.remove('editing-mode');
+    // Mantém escola bloqueada se usuário for do tipo escola
+    if (currentSchool) {
+      const selectEscola = document.getElementById('unidade_escolar');
+      selectEscola.value    = currentSchool;
+      selectEscola.disabled = true;
+    }
+  }
+
+  // ── Toast ──────────────────────────────────────────
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2800);
+  }
+
+  // ── Import XLSX ────────────────────────────────────
+  function importXLSX(input) {
+    const file = input.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      try {
+        const wb = XLSX.read(e.target.result, { type: 'array', cellDates: true });
+
+        const sheetName = wb.SheetNames.find(n => n.toLowerCase().includes('aluno')) || wb.SheetNames[0];
+        const ws = wb.Sheets[sheetName];
+        const rows = XLSX.utils.sheet_to_json(ws, { defval: '' });
+
+        if (rows.length === 0) {
+          showToast('⚠ Nenhum dado encontrado na planilha.');
+          input.value = '';
+          return;
+        }
+
+        // Normaliza cabeçalhos: mapeia nomes da planilha para as chaves internas
+        const keyMap = {
+          'num': 'num', 'unidade_escolar': 'unidade_escolar', 'cpf': 'cpf',
+          'aluno': 'aluno', 'data_nascimento': 'data_nascimento',
+          'ordem_judicial': 'ordem_judicial', 'ano_escolaridade': 'ano_escolaridade',
+          'turno': 'turno', 'ano_laudo': 'ano_laudo', 'tipo_deficiencia': 'tipo_deficiencia',
+          'caso_severo': 'caso_severo', 'mediador': 'mediador', 'cuidador': 'cuidador',
+          'sala_recursos': 'sala_recursos', 'acompanhamento_inst': 'acompanhamento_inst',
+          'necessita': 'necessita', 'investigacao': 'investigacao'
+        };
+
+        const imported = rows.map(row => {
+          const record = {};
+          COLS.forEach(col => {
+            // Para o campo investigacao, aceita também o nome antigo "situacao" na planilha
+            const aliases = col.key === 'investigacao' ? [col.key, 'situacao']
+                          : col.key === 'num'          ? [col.key, 'id']
+                          : [col.key];
+            const rawKey = Object.keys(row).find(k => aliases.includes(k.toLowerCase())) || col.key;
+            let val = row[rawKey] !== undefined ? String(row[rawKey]) : '';
+
+            // Formata data se for objeto Date
+            if (col.key === 'data_nascimento' && row[rawKey] instanceof Date) {
+              const d = row[rawKey];
+              val = d.toISOString().slice(0, 10);
+            } else if (col.key === 'data_nascimento' && val) {
+              // Tenta converter número serial do Excel para data
+              const num = parseFloat(val);
+              if (!isNaN(num) && num > 1000) {
+                const d = new Date(Math.round((num - 25569) * 86400 * 1000));
+                val = d.toISOString().slice(0, 10);
+              }
+            }
+
+            // Limpa ".0" de anos numéricos
+            if (col.key === 'ano_laudo' && val.endsWith('.0')) val = val.replace('.0', '');
+            if (col.key === 'investigacao' && val === 'Em investigação estudo') val = 'Estudo';
+
+            record[col.key] = val;
+          });
+
+          // Gera ID automático se não tiver ou for apenas número simples
+          if (!record.num || /^\d+$/.test(record.num)) {
+            // será atribuído após o map
+            record._needsId = true;
+          }
+
+          return record;
+        }).map((record, idx) => {
+          if (record._needsId) {
+            const year = new Date().getFullYear();
+            record.num = `NEE-${year}-${String(idx + 1).padStart(4, '0')}`;
+            delete record._needsId;
+          }
+          return record;
+        });
+
+        records = imported;
+        currentPage = 1;
+        renderTable();
+        saveToServer().then(() => showToast(`✓ ${imported.length} registro(s) importado(s) e salvos!`));
+      } catch (err) {
+        showToast('⚠ Erro ao ler a planilha. Verifique o arquivo.');
+        console.error(err);
+      }
+      input.value = ''; // reset para permitir reimportar o mesmo arquivo
+    };
+    reader.readAsArrayBuffer(file);
+  }
+
+  // ── Export XLSX (formatação idêntica à planilha original) ──
+  async function exportXLSX() {
+    if (records.length === 0) {
+      showToast('⚠ Nenhum registro para exportar.');
+      return;
+    }
+
+    const wb = new ExcelJS.Workbook();
+
+    // ── Sheet 1: aluno NEE ──────────────────────────────────
+    const ws = wb.addWorksheet('aluno NEE');
+
+    // Larguras exatas da planilha original
+    ws.columns = [
+      { key: 'id',                width: 16    },
+      { key: 'unidade_escolar',   width: 41.57 },
+      { key: 'cpf',               width: 19.43 },
+      { key: 'aluno',             width: 25.86 },
+      { key: 'data_nascimento',   width: 17.71 },
+      { key: 'sexo',              width: 12.0  },
+      { key: 'ordem_judicial',    width: 11.43 },
+      { key: 'ano_escolaridade',  width: 9.86  },
+      { key: 'turno',             width: 10.43 },
+      { key: 'ano_laudo',         width: 9.86  },
+      { key: 'tipo_deficiencia',  width: 41.57 },
+      { key: 'caso_severo',       width: 8.43  },
+      { key: 'mediador',          width: 22.0  },
+      { key: 'cuidador',          width: 16.57 },
+      { key: 'sala_recursos',     width: 9.0   },
+      { key: 'acompanhamento_inst', width: 8.29 },
+      { key: 'necessita',         width: 41.57 },
+      { key: 'situacao',          width: 12.0  },
+    ];
+
+    const exportHeaders = ['id','unidade_escolar','cpf','aluno','data_nascimento',
+      'sexo','ordem_judicial','ano_escolaridade','turno','ano_laudo','tipo_deficiencia',
+      'caso_severo','mediador','cuidador','sala_recursos','acompanhamento_inst',
+      'necessita','situacao'];
+
+    // Estilo do cabeçalho padrão (fundo azul claro DBE5F1)
+    const styleLight = {
+      font: { bold: true, size: 12, color: { argb: 'FF000000' } },
+      fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFDBE5F1' } },
+      alignment: { horizontal: 'center', vertical: 'middle', wrapText: true },
+      border: { bottom: { style: 'thin', color: { argb: 'FF000000' } } }
+    };
+
+    // Estilo azul escuro (colunas B, C, Q)
+    const styleDark = {
+      font: { bold: true, size: 10, color: { argb: 'FFFFFFFF' } },
+      fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF2E6EA6' } },
+      alignment: { horizontal: 'center', vertical: 'middle', wrapText: true },
+      border: { top: { style: 'thin', color: { argb: 'FF000000' } } }
+    };
+
+    // Cabeçalhos com nome original da planilha
+    const headerLabels = ['id','unidade_escolar','cpf','aluno','data_nascimento',
+      'sexo','ordem_judicial','ano_escolaridade','turno','ano_laudo','tipo_deficiencia',
+      'caso_severo','mediador','cuidador','sala_recursos','acompanhamento_inst',
+      'necessita','situacao'];
+
+    const darkCols = new Set([1, 2, 17]); // B=2(idx1), C=3(idx2), Q=17(idx16) → 1-based
+
+    const headerRow = ws.addRow(headerLabels);
+    headerRow.height = 48;
+    headerRow.eachCell((cell, colNum) => {
+      Object.assign(cell, darkCols.has(colNum) ? styleDark : styleLight);
+    });
+
+    // Filtro automático e congelar linha 1
+    ws.autoFilter = { from: 'A1', to: 'R1' };
+    ws.views = [{ state: 'frozen', ySplit: 1 }];
+
+    // Validações de dados (listas suspensas) — idênticas à planilha original
+    const validations = [
+      { sqref: 'B2:B500', formula: 'Listas!$A$2:$A$50' },   // unidade_escolar
+      { sqref: 'F2:F500', formula: '"Masculino,Feminino"' }, // sexo
+      { sqref: 'G2:G500', formula: 'Listas!$B$2:$B$10' },   // ordem_judicial
+      { sqref: 'H2:H500', formula: 'Listas!$C$2:$C$30' },   // ano_escolaridade
+      { sqref: 'I2:I500', formula: 'Listas!$D$2:$D$10' },   // turno
+      { sqref: 'J2:J500', formula: 'Listas!$E$2:$E$20' },   // ano_laudo
+      { sqref: 'K2:K500', formula: 'Listas!$F$2:$F$30' },   // tipo_deficiencia
+      { sqref: 'L2:L500', formula: 'Listas!$G$2:$G$10' },   // caso_severo
+      { sqref: 'M2:M500', formula: 'Listas!$H$2:$H$20' },   // mediador
+      { sqref: 'N2:N500', formula: 'Listas!$H$2:$H$20' },   // cuidador
+      { sqref: 'O2:P500', formula: 'Listas!$I$2:$I$10' },   // sala_recursos / acomp_inst
+      { sqref: 'Q2:Q500', formula: 'Listas!$J$2:$J$20' },   // necessita
+      { sqref: 'R2:R500', formula: 'Listas!$K$2:$K$10' },   // situacao
+    ];
+    validations.forEach(({ sqref, formula }) => {
+      ws.dataValidations.add(sqref, {
+        type: 'list',
+        allowBlank: true,
+        formulae: [formula],
+        showDropDown: false,
+        showErrorMessage: false,
+      });
+    });
+    // Validação de data para data_nascimento
+    ws.dataValidations.add('E2:E500', {
+      type: 'date',
+      operator: 'greaterThan',
+      allowBlank: true,
+      formulae: [new Date(2000, 0, 1)],
+      showErrorMessage: false,
+    });
+
+    // Linhas de dados
+    const internalKeys = ['num','unidade_escolar','cpf','aluno','data_nascimento',
+      'sexo','ordem_judicial','ano_escolaridade','turno','ano_laudo','tipo_deficiencia',
+      'caso_severo','mediador','cuidador','sala_recursos','acompanhamento_inst',
+      'necessita','investigacao'];
+
+    records.forEach(r => {
+      const rowData = internalKeys.map(k => {
+        const v = r[k] || '';
+        if (k === 'data_nascimento' && v) {
+          const d = new Date(v);
+          return isNaN(d) ? v : d;
+        }
+        if (k === 'ano_laudo') {
+          const n = parseInt(v);
+          return isNaN(n) ? v : n;
+        }
+        return v;
+      });
+      const dataRow = ws.addRow(rowData);
+      dataRow.getCell(1).alignment = { horizontal: 'center', vertical: 'center' };
+      // Formata célula de data
+      dataRow.getCell(5).numFmt = 'dd/mm/yyyy';
+    });
+
+    // ── Sheet 2: Listas ─────────────────────────────────────
+    const ws2 = wb.addWorksheet('Listas');
+    const listas = {
+      Escolas: ['EMEF Anísio Teixeira','EMEF Dom Pedro II','EMEF Machado de Assis','EMEF Cecília Meireles','EMEF Rui Barbosa','EMEF Monteiro Lobato','EMEF Clarice Lispector','EMEF Carlos Drummond','EMEF Castro Alves','EMEF Vinícius de Moraes'],
+      OrdemJudicial: ['Sim','Não'],
+      AnoEscolaridade: ['Berçário','G1','G2','G3','Pré I','Pré II','1º ano','2º ano','3º ano','4º ano','5º ano','6º ano','7º ano','8º ano','9º ano'],
+      Turno: ['Manhã','Tarde','Integral'],
+      AnoLaudo: [2019,2020,2021,2022,2023,2024,2025,2026],
+      TipoDeficiencia: ['Autismo - F84.0','TDAH - F90.0','Deficiência Física - Z73','Deficiência Visual - H54','Deficiência Auditiva - H90','Deficiência Intelectual - F79','Transtorno Opositor - F91.3','Paralisia Cerebral - G80','Síndrome de Down - Q90'],
+      CasoSevero: ['Sim','Não'],
+      NomesApoio: ['Maria Clara Nunes','Tereza Lima','Rosângela Ferreira','Carlos Henrique Souza','Patrícia Oliveira','Juliana Alves','Fernanda Costa','André Martins'],
+      SimNao: ['Sim','Não'],
+      Necessita: ['Mediação escolar','Apoio psicopedagógico','Intérprete de Libras','Cuidador','Sala de Recursos','Acompanhamento terapêutico'],
+      Investigacao: ['Com laudo','Estudo']
+    };
+    const listKeys = Object.keys(listas);
+    ws2.addRow(listKeys);
+    ws2.columns = listKeys.map(() => ({ width: 24 }));
+    const maxLen = Math.max(...Object.values(listas).map(a => a.length));
+    for (let i = 0; i < maxLen; i++) {
+      ws2.addRow(listKeys.map(h => listas[h][i] !== undefined ? listas[h][i] : ''));
+    }
+
+    // ── Download ────────────────────────────────────────────
+    const buf = await wb.xlsx.writeBuffer();
+    const blob = new Blob([buf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `SIEE_${new Date().toISOString().slice(0,10)}.xlsx`;
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast('⬇ Arquivo Excel exportado!');
+  }
+</script>
+</body>
+</html>
 

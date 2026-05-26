@@ -1995,10 +1995,15 @@
       const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
         headers: { 'X-Master-Key': JSONBIN_KEY }
       });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(`HTTP ${res.status}: ${err.message || 'Erro ao carregar'}`);
+      }
       const data = await res.json();
       records = data.record.records || [];
     } catch (e) {
       console.error('Erro ao carregar dados:', e);
+      showToast(`⚠ Erro ao carregar dados: ${e.message}`);
     }
   }
 
@@ -2017,10 +2022,14 @@
           },
           body
         });
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(`HTTP ${res.status}: ${err.message || 'Erro ao criar bin'}`);
+        }
         const data = await res.json();
         BIN_ID = data.metadata.id;
       } else {
-        await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+        const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -2028,10 +2037,15 @@
           },
           body
         });
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(`HTTP ${res.status}: ${err.message || 'Erro ao salvar'}`);
+        }
       }
     } catch (e) {
       console.error('Erro ao salvar dados:', e);
-      showToast('⚠ Erro ao salvar no servidor.');
+      showToast(`⚠ Erro ao salvar: ${e.message}`);
+      throw e; // propaga para o caller saber que falhou
     }
   }
 

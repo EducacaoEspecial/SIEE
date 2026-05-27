@@ -1974,6 +1974,7 @@
     { key: 'acompanhamento_inst', label: 'Acomp. Inst.' },
     { key: 'necessita',         label: 'Necessita' },
     { key: 'investigacao',      label: 'Situação' },
+    { key: 'inserido_por',      label: 'Inserido por' },
   ];
 
   // ── CPF mask ───────────────────────────────────────
@@ -2076,6 +2077,9 @@
     if (editIndex !== null) {
       // Mantém o ID original ao editar
       row.num = records[editIndex].num;
+      // Mantém quem inseriu originalmente; atualiza quem editou
+      row.inserido_por = records[editIndex].inserido_por || document.getElementById('userLabel').textContent;
+      row.editado_por  = document.getElementById('userLabel').textContent;
       records[editIndex] = row;
       editIndex = null;
       document.getElementById('submitBtn').textContent = '✚ Adicionar Registro';
@@ -2084,6 +2088,7 @@
     } else {
       // Gera novo ID automaticamente
       row.num = generateId();
+      row.inserido_por = document.getElementById('userLabel').textContent;
       records.push(row);
       currentPage = Math.ceil(records.length / perPage);
       showToast('✓ Registro salvo com sucesso!');
@@ -2135,10 +2140,10 @@
       return String(text).replace(new RegExp(`(${escaped})`, 'gi'), '<mark class="hl">$1</mark>');
     }
 
-    const visibleCols = ['num', 'aluno', 'unidade_escolar', 'tipo_deficiencia', 'turno', 'investigacao'];
+    const visibleCols = ['num', 'aluno', 'unidade_escolar', 'tipo_deficiencia', 'turno', 'investigacao', 'inserido_por'];
     const colWidths = {
-      num: '120px', aluno: '22%', unidade_escolar: '20%',
-      tipo_deficiencia: '20%', turno: '70px', investigacao: '90px',
+      num: '120px', aluno: '20%', unidade_escolar: '18%',
+      tipo_deficiencia: '18%', turno: '70px', investigacao: '90px', inserido_por: '13%',
     };
 
     let html = '<div class="table-wrap"><table style="table-layout:fixed;width:100%"><thead><tr>';
@@ -2449,12 +2454,14 @@
       { key: 'acompanhamento_inst', width: 8.29 },
       { key: 'necessita',         width: 41.57 },
       { key: 'situacao',          width: 12.0  },
+      { key: 'inserido_por',      width: 22.0  },
     ];
 
-    const exportHeaders = ['id','unidade_escolar','cpf','aluno','data_nascimento',
+    // Cabeçalhos com nome original da planilha
+    const headerLabels = ['id','unidade_escolar','cpf','aluno','data_nascimento',
       'sexo','ordem_judicial','ano_escolaridade','turno','ano_laudo','tipo_deficiencia',
       'caso_severo','mediador','cuidador','sala_recursos','acompanhamento_inst',
-      'necessita','situacao'];
+      'necessita','situacao','inserido_por'];
 
     // Estilo do cabeçalho padrão (fundo azul claro DBE5F1)
     const styleLight = {
@@ -2472,12 +2479,6 @@
       border: { top: { style: 'thin', color: { argb: 'FF000000' } } }
     };
 
-    // Cabeçalhos com nome original da planilha
-    const headerLabels = ['id','unidade_escolar','cpf','aluno','data_nascimento',
-      'sexo','ordem_judicial','ano_escolaridade','turno','ano_laudo','tipo_deficiencia',
-      'caso_severo','mediador','cuidador','sala_recursos','acompanhamento_inst',
-      'necessita','situacao'];
-
     const darkCols = new Set([1, 2, 17]); // B=2(idx1), C=3(idx2), Q=17(idx16) → 1-based
 
     const headerRow = ws.addRow(headerLabels);
@@ -2487,7 +2488,7 @@
     });
 
     // Filtro automático e congelar linha 1
-    ws.autoFilter = { from: 'A1', to: 'R1' };
+    ws.autoFilter = { from: 'A1', to: 'S1' };
     ws.views = [{ state: 'frozen', ySplit: 1 }];
 
     // Validações de dados (listas suspensas) — idênticas à planilha original
@@ -2528,7 +2529,7 @@
     const internalKeys = ['num','unidade_escolar','cpf','aluno','data_nascimento',
       'sexo','ordem_judicial','ano_escolaridade','turno','ano_laudo','tipo_deficiencia',
       'caso_severo','mediador','cuidador','sala_recursos','acompanhamento_inst',
-      'necessita','investigacao'];
+      'necessita','investigacao','inserido_por'];
 
     records.forEach(r => {
       const rowData = internalKeys.map(k => {
@@ -2586,5 +2587,4 @@
 </script>
 </body>
 </html>
-
 

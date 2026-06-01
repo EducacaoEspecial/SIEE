@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -412,6 +414,31 @@
   }
   .search-clear:hover { color: var(--accent3); }
   mark.hl { background: rgba(88,166,255,.28); color: var(--text); border-radius: 2px; padding: 0 1px; }
+
+  .filter-regiao {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .72rem;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    border-radius: 8px;
+    padding: .28rem .6rem;
+    cursor: pointer;
+    outline: none;
+    appearance: none;
+    -webkit-appearance: none;
+    transition: border-color .15s, box-shadow .15s;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 12 12'%3E%3Cpath fill='%238b949e' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right .5rem center;
+    padding-right: 1.6rem;
+  }
+  .filter-regiao:focus {
+    border-color: var(--accent2);
+    box-shadow: 0 0 0 3px rgba(88,166,255,.12);
+    color: var(--text);
+  }
+  .filter-regiao option { background: var(--surface); }
 
   /* Toast */
   #toast {
@@ -1415,12 +1442,26 @@
 
 <!-- TABELA -->
 <div class="card" style="max-width:860px;margin:2rem auto 1rem;">
-  <div class="card-header" style="justify-content:space-between;">
+  <div class="card-header" style="justify-content:space-between;flex-wrap:wrap;gap:.6rem;">
     <span style="display:flex;align-items:center;gap:.5rem">Registros Adicionados</span>
-    <div class="search-wrap">
-      <span class="search-icon">⌕</span>
-      <input type="text" id="searchInput" class="search-input" placeholder="Buscar nome, CPF, escola, deficiência..." oninput="onSearch()">
-      <button class="search-clear" id="searchClear" onclick="clearSearch()" title="Limpar busca" style="display:none">✕</button>
+    <div style="display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;">
+      <select class="filter-regiao" id="filterRegiao" onchange="onRegiaoFilter()" title="Filtrar por região">
+        <option value="">Todas as regiões</option>
+        <option value="Região 1">Região 1 — Sede</option>
+        <option value="Região 2">Região 2 — Baixada Campista</option>
+        <option value="Região 3">Região 3 — Norte</option>
+        <option value="Região 4">Região 4 — Litoral Norte</option>
+        <option value="Região 5">Região 5 — São Sebastião de Campos</option>
+        <option value="Região 6">Região 6 — Travessão</option>
+        <option value="Região 7">Região 7 — Morangaba (Rio Preto)</option>
+        <option value="Região 8">Região 8 — Dores de Macabú e Serrinha</option>
+        <option value="Região 9">Região 9 — Morro do Coco, Santo Eduardo, Santa Maria e Vila Nova</option>
+      </select>
+      <div class="search-wrap">
+        <span class="search-icon">⌕</span>
+        <input type="text" id="searchInput" class="search-input" placeholder="Buscar nome, CPF, escola, deficiência..." oninput="onSearch()">
+        <button class="search-clear" id="searchClear" onclick="clearSearch()" title="Limpar busca" style="display:none">✕</button>
+      </div>
     </div>
   </div>
   <div id="tableArea">
@@ -1538,7 +1579,7 @@
   // Lista completa de todas as escolas (para opção "todas as regiões")
   const TODAS_ESCOLAS = Object.values(ESCOLAS_POR_REGIAO).flat().sort((a, b) => a.localeCompare(b, 'pt-BR'));
 
-  // Mapa escola → número de região (ex: 'EM Nação Goitacá' → '3')
+  // Mapa invertido escola → label de região
   const ESCOLA_PARA_REGIAO = {};
   Object.entries(ESCOLAS_POR_REGIAO).forEach(([num, lista]) => {
     lista.forEach(nome => { ESCOLA_PARA_REGIAO[nome] = num; });
@@ -1912,6 +1953,7 @@
   let currentPage = 1;
   let perPage = 20;
   let searchQuery = '';
+  let filterRegiao = '';
 
   const COLS = [
     { key: 'num',               label: 'ID' },
@@ -2028,14 +2070,13 @@
       if (c.key === 'necessita') {
         row[c.key] = necessita;
       } else if (c.key === 'regiao') {
-        // será preenchida automaticamente pelo nome da escola
         row[c.key] = '';
       } else {
         const el = document.getElementById(c.key);
         row[c.key] = el ? el.value : '';
       }
     });
-    // Preenche região automaticamente com base na escola selecionada
+    // Preenche região automaticamente pela escola
     row.regiao = getRegiaoLabel(row.unidade_escolar);
 
     if (editIndex !== null) {
@@ -2072,12 +2113,17 @@
       ? records.filter(r => r.inserido_por === document.getElementById('userLabel').textContent)
       : records;
 
+    // Filtra por região (dropdown)
+    const regiaoFiltered = filterRegiao
+      ? schoolFiltered.filter(r => (r.regiao || '').startsWith(filterRegiao))
+      : schoolFiltered;
+
     // Filtra registros conforme busca
     const q = searchQuery.trim().toLowerCase();
-    const searchKeys = ['num','aluno','cpf','unidade_escolar','tipo_deficiencia','turno','investigacao','mediador','cuidador'];
+    const searchKeys = ['num','aluno','cpf','unidade_escolar','regiao','tipo_deficiencia','mediador','cuidador'];
     const filtered = q
-      ? schoolFiltered.filter(r => searchKeys.some(k => (r[k] || '').toLowerCase().includes(q)))
-      : schoolFiltered;
+      ? regiaoFiltered.filter(r => searchKeys.some(k => (r[k] || '').toLowerCase().includes(q)))
+      : regiaoFiltered;
 
     if (records.length === 0) {
       area.innerHTML = '<div class="empty-state">Nenhum registro adicionado ainda.</div>';
@@ -2104,13 +2150,13 @@
       return String(text).replace(new RegExp(`(${escaped})`, 'gi'), '<mark class="hl">$1</mark>');
     }
 
-    const visibleCols = ['num', 'aluno', 'unidade_escolar', 'tipo_deficiencia', 'turno', 'investigacao', 'inserido_por'];
+    const visibleCols = ['num', 'aluno', 'unidade_escolar', 'tipo_deficiencia', 'regiao', 'inserido_por'];
     const colWidths = {
       num: '120px', aluno: '18%', unidade_escolar: '17%',
-      tipo_deficiencia: '17%', turno: '90px', investigacao: '100px', inserido_por: '120px',
+      tipo_deficiencia: '17%', regiao: '20%', inserido_por: '120px',
     };
     const colMinWidths = {
-      inserido_por: '120px', investigacao: '100px', turno: '90px', num: '120px', tipo_deficiencia: '130px',
+      inserido_por: '120px', regiao: '140px', num: '120px', tipo_deficiencia: '130px',
     };
 
     let html = '<div class="table-wrap"><table style="table-layout:auto;width:100%"><thead><tr>';
@@ -2134,7 +2180,7 @@
           val = `<span class="badge ${cls}" title="${val}">${hl(display)}</span>`;
         } else if (k === 'num') {
           val = `<span style="font-size:.7rem;font-family:'JetBrains Mono',monospace;white-space:nowrap;">${val}</span>`;
-        } else if (['aluno','unidade_escolar','tipo_deficiencia'].includes(k)) {
+        } else if (['aluno','unidade_escolar','tipo_deficiencia','regiao'].includes(k)) {
           val = `<span title="${r[k]||''}" style="display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${hl(val)}</span>`;
         } else {
           val = hl(val);
@@ -2204,6 +2250,12 @@
     currentPage = 1;
     renderTable();
     document.getElementById('searchInput').focus();
+  }
+
+  function onRegiaoFilter() {
+    filterRegiao = document.getElementById('filterRegiao').value;
+    currentPage = 1;
+    renderTable();
   }
 
   function goPage(p) {
@@ -2473,7 +2525,7 @@
       border: { top: { style: 'thin', color: { argb: 'FF000000' } } }
     };
 
-    const darkCols = new Set([1, 2, 18]); // B=2(unidade_escolar), C=3(regiao) já no styleLight, R=18(necessita)
+    const darkCols = new Set([1, 2, 18]); // A=id, B=unidade_escolar, R=necessita
 
     const headerRow = ws.addRow(headerLabels);
     headerRow.height = 48;
@@ -2485,7 +2537,7 @@
     ws.autoFilter = { from: 'A1', to: 'T1' };
     ws.views = [{ state: 'frozen', ySplit: 1 }];
 
-    // Validações de dados (listas suspensas) — idênticas à planilha original
+    // Validações de dados (listas suspensas)
     const validations = [
       { sqref: 'B2:B500', formula: 'Listas!$A$2:$A$50' },   // unidade_escolar
       { sqref: 'G2:G500', formula: '"Masculino,Feminino"' }, // sexo
@@ -2540,7 +2592,7 @@
       });
       const dataRow = ws.addRow(rowData);
       dataRow.getCell(1).alignment = { horizontal: 'center', vertical: 'center' };
-      // Formata célula de data
+      // Formata célula de data (col F = índice 6 após inserção de regiao)
       dataRow.getCell(6).numFmt = 'dd/mm/yyyy';
     });
 

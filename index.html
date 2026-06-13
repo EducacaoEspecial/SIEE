@@ -225,6 +225,24 @@
     border: 1px solid var(--border);
   }
 
+  .btn-salvar-hd {
+    font-family: 'Sora', sans-serif; font-size: .88rem; font-weight: 600;
+    background: var(--accent); color: #fff;
+    border: none; border-radius: var(--radius);
+    padding: .7rem 1.5rem; cursor: pointer;
+    transition: opacity .15s; position: relative;
+    display: flex; align-items: center; gap: .5rem;
+  }
+  .btn-salvar-hd:hover { opacity: .85; }
+  .btn-salvar-hd:disabled { opacity: .45; cursor: default; }
+  .badge-pendente {
+    position: absolute; top: -5px; right: -5px;
+    width: 11px; height: 11px;
+    background: var(--accent3); border-radius: 50%;
+    border: 2px solid var(--bg); display: none;
+  }
+  .btn-salvar-hd.pendente .badge-pendente { display: block; }
+
   .btn-export {
     background: transparent;
     border: 1px solid var(--accent2);
@@ -532,6 +550,199 @@
   @media (max-width: 900px) {
     .col-inserido_por { display: none; }
   }
+
+  /* Modal planilha vazia */
+  #modalPlanilhaVazia, #modalJuntarPlanilhas {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(13,17,23,.85);
+    backdrop-filter: blur(4px);
+    align-items: center; justify-content: center;
+    z-index: 990;
+  }
+  #modalPlanilhaVazia.open, #modalJuntarPlanilhas.open { display: flex; }
+
+  .modal-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2rem 1.75rem 1.75rem;
+    width: 100%; max-width: 480px;
+    display: flex; flex-direction: column; gap: 1.25rem;
+    box-shadow: 0 24px 64px rgba(0,0,0,.6);
+  }
+
+  .modal-box h3 {
+    font-size: 1rem; font-weight: 700; letter-spacing: -.3px;
+  }
+  .modal-box h3 span {
+    display: block; font-size: .72rem; font-weight: 400;
+    color: var(--muted); font-family: 'JetBrains Mono', monospace; margin-top: 3px;
+  }
+
+  .modal-search-wrap {
+    display: flex; align-items: center;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: .3rem .7rem; gap: .4rem;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  .modal-search-wrap:focus-within {
+    border-color: var(--accent2);
+    box-shadow: 0 0 0 3px rgba(88,166,255,.12);
+  }
+  .modal-search-input {
+    background: none; border: none; outline: none;
+    color: var(--text); font-family: 'Sora', sans-serif;
+    font-size: .82rem; padding: .2rem 0; width: 100%;
+  }
+  .modal-search-input::placeholder { color: var(--muted); }
+
+  .escola-list-wrap {
+    max-height: 240px;
+    overflow-y: auto;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg);
+  }
+  .escola-list-wrap::-webkit-scrollbar { width: 5px; }
+  .escola-list-wrap::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+  .escola-opt {
+    display: flex; align-items: center; gap: .65rem;
+    padding: .55rem .85rem;
+    cursor: pointer; font-size: .82rem;
+    border-bottom: 1px solid var(--border);
+    transition: background .1s; user-select: none;
+  }
+  .escola-opt:last-child { border-bottom: none; }
+  .escola-opt:hover { background: var(--surface2); }
+  .escola-opt.selected { background: rgba(88,166,255,.1); }
+  .escola-opt.opt-todas {
+    font-weight: 600; color: var(--accent2);
+    border-bottom: 1px solid var(--border);
+    position: sticky; top: 0;
+    background: var(--bg); z-index: 1;
+  }
+  .escola-opt.opt-todas:hover { background: rgba(88,166,255,.08); }
+  .escola-opt.opt-todas.selected { background: rgba(88,166,255,.15); }
+
+  .escola-check {
+    width: 16px; height: 16px; flex-shrink: 0;
+    border: 2px solid var(--muted);
+    border-radius: 3px;
+    background: transparent;
+    display: flex; align-items: center; justify-content: center;
+    font-size: .75rem; font-weight: 700; color: transparent;
+    transition: background .12s, border-color .12s, color .12s;
+  }
+  .escola-opt.selected .escola-check {
+    background: var(--accent2);
+    border-color: var(--accent2);
+    color: #fff;
+  }
+  .escola-opt:hover .escola-check {
+    border-color: var(--accent2);
+  }
+
+  .modal-footer {
+    display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .modal-sel-count {
+    font-size: .75rem; color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .modal-footer-btns { display: flex; gap: .7rem; }
+
+  .btn-modal-cancel {
+    font-family: 'Sora', sans-serif; font-size: .85rem; font-weight: 600;
+    background: var(--surface2); color: var(--muted);
+    border: 1px solid var(--border); border-radius: var(--radius);
+    padding: .6rem 1.2rem; cursor: pointer; transition: opacity .15s;
+  }
+  .btn-modal-cancel:hover { opacity: .8; }
+
+  .btn-modal-gerar {
+    font-family: 'Sora', sans-serif; font-size: .85rem; font-weight: 600;
+    background: var(--accent2); color: #fff;
+    border: none; border-radius: var(--radius);
+    padding: .6rem 1.4rem; cursor: pointer; transition: opacity .15s;
+    display: flex; align-items: center; gap: .4rem;
+  }
+  .btn-modal-gerar:hover { opacity: .88; }
+  .btn-modal-gerar:disabled { opacity: .4; cursor: not-allowed; }
+
+  .btn-modal-juntar {
+    font-family: 'Sora', sans-serif; font-size: .85rem; font-weight: 600;
+    background: var(--accent); color: #fff;
+    border: none; border-radius: var(--radius);
+    padding: .6rem 1.4rem; cursor: pointer; transition: opacity .15s;
+    display: flex; align-items: center; gap: .4rem;
+  }
+  .btn-modal-juntar:hover { opacity: .88; }
+  .btn-modal-juntar:disabled { opacity: .4; cursor: not-allowed; }
+
+  .btn-planilha-vazia {
+    font-family: 'Sora', sans-serif; font-size: .88rem; font-weight: 600;
+    background: transparent; border: 1px solid var(--muted); color: var(--muted);
+    border-radius: var(--radius); padding: .7rem 1.5rem;
+    cursor: pointer; transition: color .15s, border-color .15s;
+    display: flex; align-items: center; gap: .5rem;
+  }
+  .btn-planilha-vazia:hover { color: var(--text); border-color: var(--text); }
+
+  .btn-juntar {
+    font-family: 'Sora', sans-serif; font-size: .88rem; font-weight: 600;
+    background: transparent; border: 1px solid var(--accent); color: var(--accent);
+    border-radius: var(--radius); padding: .7rem 1.5rem;
+    cursor: pointer; transition: opacity .15s;
+    display: flex; align-items: center; gap: .5rem;
+  }
+  .btn-juntar:hover { opacity: .8; }
+
+  /* Drop zone para modal de juntar */
+  .drop-zone {
+    border: 2px dashed var(--border);
+    border-radius: var(--radius);
+    padding: 1.5rem 1rem;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color .15s, background .15s;
+    font-size: .85rem; color: var(--muted);
+    display: flex; flex-direction: column; align-items: center; gap: .5rem;
+  }
+  .drop-zone:hover, .drop-zone.dragover {
+    border-color: var(--accent2);
+    background: rgba(88,166,255,.05);
+    color: var(--text);
+  }
+  .drop-zone .drop-icon { font-size: 1.8rem; line-height: 1; }
+  .drop-zone strong { font-size: .88rem; color: var(--text); }
+
+  .arquivos-selecionados {
+    display: flex; flex-direction: column; gap: .3rem;
+    max-height: 180px; overflow-y: auto;
+    border: 1px solid var(--border); border-radius: var(--radius);
+    background: var(--bg);
+  }
+  .arquivos-selecionados::-webkit-scrollbar { width: 5px; }
+  .arquivos-selecionados::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+  .arquivo-item {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: .45rem .8rem; font-size: .78rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .arquivo-item:last-child { border-bottom: none; }
+  .arquivo-nome { color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 340px; }
+  .arquivo-remove {
+    background: none; border: none; color: var(--muted);
+    cursor: pointer; font-size: .8rem; padding: 0 .2rem;
+    transition: color .15s; flex-shrink: 0;
+  }
+  .arquivo-remove:hover { color: var(--accent3); }
+
 </style>
 </head>
 <body>
@@ -542,10 +753,6 @@
     <div class="logo-wrap">
       <div class="logo">📚</div>
       <h2>SIEE<span>Acesso restrito</span></h2>
-    </div>
-    <div class="field">
-      <label>Usuário</label>
-      <input type="text" id="loginUser" placeholder="Digite seu usuário" onkeydown="if(event.key==='Enter') document.getElementById('loginInput').focus()" autocomplete="username">
     </div>
     <div class="field">
       <label>Senha</label>
@@ -1470,19 +1677,65 @@
 </div>
 
 <div class="actions" style="max-width:860px;margin:0 auto;">
-  <label class="btn-import" id="btnImport" title="Importar planilha Excel" style="display:none">
-    ⬆ Importar Excel
-    <input type="file" id="importFile" accept=".xlsx,.xls" style="display:none" onchange="importXLSX(this)">
+  <label class="btn-import" id="btnImport" title="Importar um ou mais arquivos — une automaticamente se forem vários" style="display:none">
+    ⬆ Importar
+    <input type="file" id="importFile" accept=".xlsx,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" multiple style="display:none" onchange="importarArquivos(this)">
   </label>
-  <button class="btn-export" id="btnExport" onclick="exportXLSX()" style="display:none">⬇ Exportar para Excel</button>
+  <button class="btn-salvar-hd" id="btnSalvarHD" onclick="salvarHD()" style="display:none" title="Salvar dados como Excel no HD">
+    💾 Salvar
+    <span class="badge-pendente" id="badgePendente"></span>
+  </button>
+  <button class="btn-planilha-vazia" id="btnPlanilhaVazia" onclick="abrirModalPlanilhaVazia()" style="display:none" title="Criar planilhas vazias por escola">
+    📄 Criar Planilhas Vazias
+  </button>
   <button class="btn-clear-all" onclick="clearAllRecords()" title="Limpar todos os registros do servidor" id="btnClearAll" style="display:none">🗑 Limpar Tudo</button>
+</div>
+
+<!-- MODAL: PLANILHA VAZIA -->
+<div id="modalPlanilhaVazia">
+  <div class="modal-box">
+    <h3>Gerar Planilha Vazia <span>Selecione regiões ou escolas individuais — 1 arquivo por escola</span></h3>
+    <div class="modal-search-wrap">
+      <span style="color:var(--muted);font-size:1rem;">⌕</span>
+      <input type="text" class="modal-search-input" id="modalBuscaEscola" placeholder="Buscar escola..." oninput="filtrarEscolasModal()">
+    </div>
+    <div class="escola-list-wrap" id="escolaListWrap"></div>
+    <div class="modal-footer">
+      <span class="modal-sel-count" id="modalSelCount">0 selecionada(s)</span>
+      <div class="modal-footer-btns">
+        <button class="btn-modal-cancel" onclick="fecharModalPlanilhaVazia()">Cancelar</button>
+        <button class="btn-modal-gerar" id="btnGerarPlanilhas" onclick="gerarPlanilhasVazias()" disabled>⬇ Gerar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: JUNTAR PLANILHAS -->
+<div id="modalJuntarPlanilhas">
+  <div class="modal-box">
+    <h3>Juntar Planilhas <span>Selecione os arquivos .xlsx para unir numa planilha só</span></h3>
+    <div class="drop-zone" id="dropZone" onclick="document.getElementById('inputArquivosJuntar').click()" ondragover="onDragOver(event)" ondragleave="onDragLeave(event)" ondrop="onDrop(event)">
+      <div class="drop-icon">📂</div>
+      <strong>Clique ou arraste os arquivos aqui</strong>
+      <span>Aceita múltiplos .xlsx</span>
+      <input type="file" id="inputArquivosJuntar" accept=".xlsx" multiple style="display:none" onchange="onArquivosSelecionados(this.files)">
+    </div>
+    <div class="arquivos-selecionados" id="arquivosSelecionados" style="display:none"></div>
+    <div class="modal-footer">
+      <span class="modal-sel-count" id="juntarSelCount">0 arquivo(s)</span>
+      <div class="modal-footer-btns">
+        <button class="btn-modal-cancel" onclick="fecharModalJuntar()">Cancelar</button>
+        <button class="btn-modal-juntar" id="btnExecutarJuntar" onclick="executarJuntar()" disabled>🔗 Juntar</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <div id="toast">✓ Registro adicionado com sucesso!</div>
 
 <script>
   // ── Data/hora de atualização no header ────────────
-  document.getElementById('updateLabel').textContent = 'atualizado em 01/06/2026 às 12:48';
+  document.getElementById('updateLabel').textContent = 'atualizado em 13/06/2026 às 11:38';
 
   // ── Escolas por região ─────────────────────────────
   const ESCOLAS_POR_REGIAO = {
@@ -1636,229 +1889,6 @@
   }
   const USERS = {
     'admin123': { role: 'admin', label: 'Administrador', escola: null },
-    'ce.29maio': { role: 'escola', label: 'CE 29 de Maio', escola: 'CE 29 de Maio', senha: '29@2025' },
-    // 'cem.aldeia': { role: 'escola', label: 'CEM Aldeia', escola: 'CEM Aldeia', senha: 'aldeia@2025' },
-    // 'cem.anabeatriz': { role: 'escola', label: 'CEM Ana Beatriz Rangel da Silva', escola: 'CEM Ana Beatriz Rangel da Silva', senha: 'ana@2025' },
-    // 'cem.anisio': { role: 'escola', label: 'CEM Anísio Spínola Teixeira', escola: 'CEM Anísio Spínola Teixeira', senha: 'ani@2025' },
-    // 'cem.antoninovena': { role: 'escola', label: 'CEM Antonino Venâncio', escola: 'CEM Antonino Venâncio', senha: 'antonino@2025' },
-    // 'cem.antonio': { role: 'escola', label: 'CEM Antônio Nunes Vieira', escola: 'CEM Antônio Nunes Vieira', senha: 'anto@2025' },
-    // 'cem.atalibacarvalho': { role: 'escola', label: 'CEM Ataliba Carvalho de Brito', escola: 'CEM Ataliba Carvalho de Brito', senha: 'ataliba@2025' },
-    // 'cem.lvaroribeiro': { role: 'escola', label: 'CEM Álvaro Ribeiro das Neves', escola: 'CEM Álvaro Ribeiro das Neves', senha: 'lvaro@2025' },
-    // 'cem.beiratai': { role: 'escola', label: 'CEM Beira do Taí', escola: 'CEM Beira do Taí', senha: 'beira@2025' },
-    // 'cem.beneditoalves': { role: 'escola', label: 'CEM Benedito Alves Barreto', escola: 'CEM Benedito Alves Barreto', senha: 'benedito@2025' },
-    // 'cem.brunosilva': { role: 'escola', label: 'CEM Bruno da Silva Macabu', escola: 'CEM Bruno da Silva Macabu', senha: 'bruno@2025' },
-    // 'cem.conceicimbe': { role: 'escola', label: 'CEM Conceição do Imbé', escola: 'CEM Conceição do Imbé', senha: 'conceic@2025' },
-    // 'cem.desembargadorsebastia': { role: 'escola', label: 'CEM Desembargador Sebastião Amaro da Silva Machado', escola: 'CEM Desembargador Sebastião Amaro da Silva Machado', senha: 'desembargador@2025' },
-    // 'cem.domanto': { role: 'escola', label: 'CEM Dom Antônio de Castro Mayer', escola: 'CEM Dom Antônio de Castro Mayer', senha: 'dom@2025' },
-    // 'cem.domhe': { role: 'escola', label: 'CEM Dom Hélder Câmara', escola: 'CEM Dom Hélder Câmara', senha: 'dom@2025' },
-    // 'cem.donana': { role: 'escola', label: 'CEM Donana', escola: 'CEM Donana', senha: 'donana@2025' },
-    // 'cem.felix': { role: 'escola', label: 'CEM Dr. Félix Miranda - inclusão 26', escola: 'CEM Dr. Félix Miranda - inclusão 26', senha: 'fe@2025' },
-    // 'cem.emidio': { role: 'escola', label: 'CEM Emídio Teixeira de Oliveira', escola: 'CEM Emídio Teixeira de Oliveira', senha: 'emi@2025' },
-    // 'cem.eneas': { role: 'escola', label: 'CEM Enéas Tavares Trindade', escola: 'CEM Enéas Tavares Trindade', senha: 'ene@2025' },
-    // 'cem.eriveltonjunior': { role: 'escola', label: 'CEM Erivelton Junior', escola: 'CEM Erivelton Junior', senha: 'erivelton@2025' },
-    // 'cem.farolsa': { role: 'escola', label: 'CEM Farol de São Thomé', escola: 'CEM Farol de São Thomé', senha: 'farol@2025' },
-    // 'cem.felismindomarques': { role: 'escola', label: 'CEM Felismindo Marques Barreto', escola: 'CEM Felismindo Marques Barreto', senha: 'felismindo@2025' },
-    // 'cem.franciscoalves': { role: 'escola', label: 'CEM Francisco Alves Dias', escola: 'CEM Francisco Alves Dias', senha: 'francisco@2025' },
-    // 'cem.franciscocordeiro': { role: 'escola', label: 'CEM Francisco Cordeiro Pereira', escola: 'CEM Francisco Cordeiro Pereira', senha: 'francisco@2025' },
-    // 'cem.franciscoassis': { role: 'escola', label: 'CEM Francisco de Assis', escola: 'CEM Francisco de Assis', senha: 'francisco@2025' },
-    // 'cem.gandurassed': { role: 'escola', label: 'CEM Gandur Assed', escola: 'CEM Gandur Assed', senha: 'gandur@2025' },
-    // 'cem.getulio': { role: 'escola', label: 'CEM Getúlio Vargas', escola: 'CEM Getúlio Vargas', senha: 'getu@2025' },
-    // 'cem.gilbertoespi': { role: 'escola', label: 'CEM Gilberto do Espírito Santo Amaral', escola: 'CEM Gilberto do Espírito Santo Amaral', senha: 'gilberto@2025' },
-    // 'cem.glicerio': { role: 'escola', label: 'CEM Glicério Carlos Neto', escola: 'CEM Glicério Carlos Neto', senha: 'glice@2025' },
-    // 'cem.grevisiqueira': { role: 'escola', label: 'CEM Grevi Siqueira', escola: 'CEM Grevi Siqueira', senha: 'grevi@2025' },
-    // 'cem.henriquejardim': { role: 'escola', label: 'CEM Henrique Jardim da Cruz', escola: 'CEM Henrique Jardim da Cruz', senha: 'henrique@2025' },
-    // 'cem.irmadulce': { role: 'escola', label: 'CEM Irmã Dulce', escola: 'CEM Irmã Dulce', senha: 'irma@2025' },
-    // 'cem.irmazilda': { role: 'escola', label: 'CEM Irmã Zilda', escola: 'CEM Irmã Zilda', senha: 'irma@2025' },
-    // 'cem.irmazilda1': { role: 'escola', label: 'CEM Irmã Zilda de Castro', escola: 'CEM Irmã Zilda de Castro', senha: 'irma@2025' },
-    // 'cem.jardimceasa': { role: 'escola', label: 'CEM Jardim Ceasa', escola: 'CEM Jardim Ceasa', senha: 'jardim@2025' },
-    // 'cem.joabatista': { role: 'escola', label: 'CEM João Batista Veiga', escola: 'CEM João Batista Veiga', senha: 'joa@2025' },
-    // 'cem.joagoulart': { role: 'escola', label: 'CEM João Goulart', escola: 'CEM João Goulart', senha: 'joa@2025' },
-    // 'cem.joaperdecene': { role: 'escola', label: 'CEM João Perdecene Neto', escola: 'CEM João Perdecene Neto', senha: 'joa@2025' },
-    // 'cem.joasiqueira': { role: 'escola', label: 'CEM João Siqueira dos Santos', escola: 'CEM João Siqueira dos Santos', senha: 'joa@2025' },
-    // 'cem.jocineiasilva': { role: 'escola', label: 'CEM Jocineia da Silva Borges', escola: 'CEM Jocineia da Silva Borges', senha: 'jocineia@2025' },
-    // 'cem.joseca': { role: 'escola', label: 'CEM José Cândido de Carvalho', escola: 'CEM José Cândido de Carvalho', senha: 'jose@2025' },
-    // 'cem.joseeduardo': { role: 'escola', label: 'CEM José Eduardo Peixoto Zandonaide', escola: 'CEM José Eduardo Peixoto Zandonaide', senha: 'jose@2025' },
-    // 'cem.josesilveira': { role: 'escola', label: 'CEM José Silveira Lubanco', escola: 'CEM José Silveira Lubanco', senha: 'jose@2025' },
-    // 'cem.josesouza': { role: 'escola', label: 'CEM José de Souza Sodre', escola: 'CEM José de Souza Sodre', senha: 'jose@2025' },
-    // 'cem.luizgonzaga': { role: 'escola', label: 'CEM Luiz Gonzaga da Silva', escola: 'CEM Luiz Gonzaga da Silva', senha: 'luiz@2025' },
-    // 'cem.madretereza': { role: 'escola', label: 'CEM Madre Tereza de Calcutá', escola: 'CEM Madre Tereza de Calcutá', senha: 'madre@2025' },
-    // 'cem.mariaconceic': { role: 'escola', label: 'CEM Maria da Conceição Santos Tavares', escola: 'CEM Maria da Conceição Santos Tavares', senha: 'maria@2025' },
-    // 'cem.marialourdes': { role: 'escola', label: 'CEM Maria de Lourdes', escola: 'CEM Maria de Lourdes', senha: 'maria@2025' },
-    // 'cem.martinluther': { role: 'escola', label: 'CEM Martin Luther King', escola: 'CEM Martin Luther King', senha: 'martin@2025' },
-    // 'cem.maflor': { role: 'escola', label: 'CEM Mãe Flor', escola: 'CEM Mãe Flor', senha: 'ma@2025' },
-    // 'cem.miriansantos': { role: 'escola', label: 'CEM Mirian dos Santos Melo', escola: 'CEM Mirian dos Santos Melo', senha: 'mirian@2025' },
-    // 'cem.monteirolobato': { role: 'escola', label: 'CEM Monteiro Lobato', escola: 'CEM Monteiro Lobato', senha: 'monteiro@2025' },
-    // 'cem.nadirpereira': { role: 'escola', label: 'CEM Nadir Pereira Gomes', escola: 'CEM Nadir Pereira Gomes', senha: 'nadir@2025' },
-    // 'cem.norbertosiqueira': { role: 'escola', label: 'CEM Norberto Siqueira Barreto', escola: 'CEM Norberto Siqueira Barreto', senha: 'norberto@2025' },
-    // 'cem.olimpio': { role: 'escola', label: 'CEM Olímpio Paulo da Silva', escola: 'CEM Olímpio Paulo da Silva', senha: 'oli@2025' },
-    // 'cem.parqueaurora': { role: 'escola', label: 'CEM Parque Aurora', escola: 'CEM Parque Aurora', senha: 'parque@2025' },
-    // 'cem.parqueguarus': { role: 'escola', label: 'CEM Parque Guarus', escola: 'CEM Parque Guarus', senha: 'parque@2025' },
-    // 'cem.parqueimperial': { role: 'escola', label: 'CEM Parque Imperial', escola: 'CEM Parque Imperial', senha: 'parque@2025' },
-    // 'cem.parqueprazeres': { role: 'escola', label: 'CEM Parque Prazeres', escola: 'CEM Parque Prazeres', senha: 'parque@2025' },
-    // 'cem.parquesantos': { role: 'escola', label: 'CEM Parque Santos Dumont', escola: 'CEM Parque Santos Dumont', senha: 'parque@2025' },
-    // 'cem.penha': { role: 'escola', label: 'CEM Penha', escola: 'CEM Penha', senha: 'penha@2025' },
-    // 'cem.paulofreire': { role: 'escola', label: 'CEM Prof. Paulo Freire', escola: 'CEM Prof. Paulo Freire', senha: 'paulo@2025' },
-    // 'cem.ngelamaria': { role: 'escola', label: 'CEM Prof.ª Ângela Maria do Amaral', escola: 'CEM Prof.ª Ângela Maria do Amaral', senha: 'ngela@2025' },
-    // 'cem.divamarina': { role: 'escola', label: 'CEM Prof.ª Diva Marina Suppa Goulart', escola: 'CEM Prof.ª Diva Marina Suppa Goulart', senha: 'diva@2025' },
-    // 'cem.joelmafigueiredo': { role: 'escola', label: 'CEM Prof.ª Joelma Figueiredo de Souza', escola: 'CEM Prof.ª Joelma Figueiredo de Souza', senha: 'joelma@2025' },
-    // 'cem.olgalinhares': { role: 'escola', label: 'CEM Prof.ª Olga Linhares Corrêa', escola: 'CEM Prof.ª Olga Linhares Corrêa', senha: 'olga@2025' },
-    // 'cem.ritaca': { role: 'escola', label: 'CEM Prof.ª Rita de Cássia Rocha Soares Chardelli', escola: 'CEM Prof.ª Rita de Cássia Rocha Soares Chardelli', senha: 'rita@2025' },
-    // 'cem.ruthchagas': { role: 'escola', label: 'CEM Prof.ª Ruth Chagas Manhães', escola: 'CEM Prof.ª Ruth Chagas Manhães', senha: 'ruth@2025' },
-    // 'cem.salvadorrangel': { role: 'escola', label: 'CEM Salvador Rangel Lopes', escola: 'CEM Salvador Rangel Lopes', senha: 'salvador@2025' },
-    // 'cem.samatheus': { role: 'escola', label: 'CEM São Matheus', escola: 'CEM São Matheus', senha: 'sa@2025' },
-    // 'cem.sebastiatavares': { role: 'escola', label: 'CEM Sebastião Tavares Campista', escola: 'CEM Sebastião Tavares Campista', senha: 'sebastia@2025' },
-    // 'cem.sergio': { role: 'escola', label: 'CEM Sérgio Luiz Lilico Paes da Silva', escola: 'CEM Sérgio Luiz Lilico Paes da Silva', senha: 'se@2025' },
-    // 'cem.silvinamanha': { role: 'escola', label: 'CEM Silvina Manhães Terra', escola: 'CEM Silvina Manhães Terra', senha: 'silvina@2025' },
-    // 'cem.subtenentecla': { role: 'escola', label: 'CEM Subtenente Cláudio Henrique Laurindo de Cravalho', escola: 'CEM Subtenente Cláudio Henrique Laurindo de Cravalho', senha: 'subtenente@2025' },
-    // 'cem.verapretyman': { role: 'escola', label: 'CEM Vera Pretyman', escola: 'CEM Vera Pretyman', senha: 'vera@2025' },
-    // 'cem.vereadorahermeny': { role: 'escola', label: 'CEM Vereadora Hermeny Coutinho', escola: 'CEM Vereadora Hermeny Coutinho', senha: 'vereadora@2025' },
-    // 'cem.wilsonamaro': { role: 'escola', label: 'CEM Wilson Amaro de Freitas', escola: 'CEM Wilson Amaro de Freitas', senha: 'wilson@2025' },
-    // 'cem.zumbipalmares': { role: 'escola', label: 'CEM Zumbi dos Palmares', escola: 'CEM Zumbi dos Palmares', senha: 'zumbi@2025' },
-    // 'escola.cemstiac': { role: 'escola', label: 'CEMSTIAC', escola: 'CEMSTIAC', senha: 'cemstiac@2025' },
-    // 'ciep.brizola142': { role: 'escola', label: 'CIEP Brizolão 142 Maestro Villa Lobos', escola: 'CIEP Brizolão 142 Maestro Villa Lobos', senha: 'brizola@2025' },
-    // 'ciep.brizola144': { role: 'escola', label: 'CIEP Brizolão 144 Prof.ª Carmem Sylvia Carneiro', escola: 'CIEP Brizolão 144 Prof.ª Carmem Sylvia Carneiro', senha: 'brizola@2025' },
-    // 'ciep.brizola269': { role: 'escola', label: 'CIEP Brizolão 269 Francisco Portela', escola: 'CIEP Brizolão 269 Francisco Portela', senha: 'brizola@2025' },
-    // 'ciep.brizola416': { role: 'escola', label: 'CIEP Brizolão 416 Wilson Batista', escola: 'CIEP Brizolão 416 Wilson Batista', senha: 'brizola@2025' },
-    // 'ciep.brizola481': { role: 'escola', label: 'CIEP Brizolão 481 Arnaldo Rosa Viana', escola: 'CIEP Brizolão 481 Arnaldo Rosa Viana', senha: 'brizola@2025' },
-    // 'em.apic': { role: 'escola', label: 'EM APIC', escola: 'EM APIC', senha: 'apic@2025' },
-    // 'em.alayrbernardes': { role: 'escola', label: 'EM Alayr Bernardes Pereira', escola: 'EM Alayr Bernardes Pereira', senha: 'alayr@2025' },
-    // 'em.albertinaazeredo': { role: 'escola', label: 'EM Albertina Azeredo Venâncio', escola: 'EM Albertina Azeredo Venâncio', senha: 'albertina@2025' },
-    // 'em.albertolamego': { role: 'escola', label: 'EM Alberto Lamego (Martins Lage)', escola: 'EM Alberto Lamego (Martins Lage)', senha: 'alberto@2025' },
-    // 'em.albertolamego1': { role: 'escola', label: 'EM Alberto Lamego (Poço Gordo)', escola: 'EM Alberto Lamego (Poço Gordo)', senha: 'alberto@2025' },
-    // 'em.alcebiades': { role: 'escola', label: 'EM Alcebíades Candiano', escola: 'EM Alcebíades Candiano', senha: 'alcebi@2025' },
-    // 'em.alfredovieira': { role: 'escola', label: 'EM Alfredo Vieira Machado', escola: 'EM Alfredo Vieira Machado', senha: 'alfredo@2025' },
-    // 'em.alicerio': { role: 'escola', label: 'EM Alicério Ribeiro da Silva', escola: 'EM Alicério Ribeiro da Silva', senha: 'alice@2025' },
-    // 'em.amaroanto': { role: 'escola', label: 'EM Amaro Antônio da Silva', escola: 'EM Amaro Antônio da Silva', senha: 'amaro@2025' },
-    // 'em.amaroprata': { role: 'escola', label: 'EM Amaro Prata Tavares', escola: 'EM Amaro Prata Tavares', senha: 'amaro@2025' },
-    // 'em.ambrosio': { role: 'escola', label: 'EM Ambrósio de Souza', escola: 'EM Ambrósio de Souza', senha: 'ambro@2025' },
-    // 'em.anleiferleite': { role: 'escola', label: 'EM Anleifer Leite Fernandes - Educação Especial', escola: 'EM Anleifer Leite Fernandes - Educação Especial', senha: 'anleifer@2025' },
-    // 'em.antonia': { role: 'escola', label: 'EM Antônia Lopes', escola: 'EM Antônia Lopes', senha: 'anto@2025' },
-    // 'em.antonio': { role: 'escola', label: 'EM Antônio Caetano Peixoto', escola: 'EM Antônio Caetano Peixoto', senha: 'anto@2025' },
-    // 'em.antonio1': { role: 'escola', label: 'EM Antônio Joaquim Codeço', escola: 'EM Antônio Joaquim Codeço', senha: 'anto@2025' },
-    // 'em.antonio2': { role: 'escola', label: 'EM Antônio de Souza Rodrigues', escola: 'EM Antônio de Souza Rodrigues', senha: 'anto@2025' },
-    // 'em.arybatista': { role: 'escola', label: 'EM Ary Batista Rangel', escola: 'EM Ary Batista Rangel', senha: 'ary@2025' },
-    // 'em.augustomachado': { role: 'escola', label: 'EM Augusto Machado Viana', escola: 'EM Augusto Machado Viana', senha: 'augusto@2025' },
-    // 'em.barreto': { role: 'escola', label: 'EM Barreto', escola: 'EM Barreto', senha: 'barreto@2025' },
-    // 'em.bartholomeulysandro': { role: 'escola', label: 'EM Bartholomeu Lysandro', escola: 'EM Bartholomeu Lysandro', senha: 'bartholomeu@2025' },
-    // 'em.brancapec': { role: 'escola', label: 'EM Branca Peçanha Ferreira', escola: 'EM Branca Peçanha Ferreira', senha: 'branca@2025' },
-    // 'em.california': { role: 'escola', label: 'EM Califórnia', escola: 'EM Califórnia', senha: 'califo@2025' },
-    // 'em.carloschagas': { role: 'escola', label: 'EM Carlos Chagas', escola: 'EM Carlos Chagas', senha: 'carlos@2025' },
-    // 'em.carlosjardim': { role: 'escola', label: 'EM Carlos Jardim da Cruz', escola: 'EM Carlos Jardim da Cruz', senha: 'carlos@2025' },
-    // 'em.claudia': { role: 'escola', label: 'EM Cláudia Almeida Pinto de Oliveira', escola: 'EM Cláudia Almeida Pinto de Oliveira', senha: 'cla@2025' },
-    'em.clovis': { role: 'escola', label: 'EM Clóvis Tavares', escola: 'EM Clóvis Tavares', senha: 'clo@2025' },
-    // 'em.conceicimbe': { role: 'escola', label: 'EM Conceição do Imbé', escola: 'EM Conceição do Imbé', senha: 'conceic@2025' },
-    // 'em.conselheirojosino': { role: 'escola', label: 'EM Conselheiro Josino', escola: 'EM Conselheiro Josino', senha: 'conselheiro@2025' },
-    // 'em.coronelanto': { role: 'escola', label: 'EM Coronel Antônio Batista', escola: 'EM Coronel Antônio Batista', senha: 'coronel@2025' },
-    // 'em.custodio': { role: 'escola', label: 'EM Custódio Generoso Vieira', escola: 'EM Custódio Generoso Vieira', senha: 'custo@2025' },
-    // 'em.custodio1': { role: 'escola', label: 'EM Custódio Siqueira', escola: 'EM Custódio Siqueira', senha: 'custo@2025' },
-    // 'em.donana': { role: 'escola', label: 'EM Donana', escola: 'EM Donana', senha: 'donana@2025' },
-    // 'em.alcindormoraes': { role: 'escola', label: 'EM Dr. Alcindor Moraes Bessa', escola: 'EM Dr. Alcindor Moraes Bessa', senha: 'alcindor@2025' },
-    // 'em.franciscomanoel': { role: 'escola', label: 'EM Dr. Francisco Manoel Pereira Crespo', escola: 'EM Dr. Francisco Manoel Pereira Crespo', senha: 'francisco@2025' },
-    // 'em.getulio': { role: 'escola', label: 'EM Dr. Getúlio Vargas', escola: 'EM Dr. Getúlio Vargas', senha: 'getu@2025' },
-    // 'em.luizguarana': { role: 'escola', label: 'EM Dr. Luiz Guaraná', escola: 'EM Dr. Luiz Guaraná', senha: 'luiz@2025' },
-    // 'em.luizsobral': { role: 'escola', label: 'EM Dr. Luiz Sobral Quadro de Educação Especial', escola: 'EM Dr. Luiz Sobral Quadro de Educação Especial', senha: 'luiz@2025' },
-    // 'em.eloyornelas': { role: 'escola', label: 'EM Eloy Ornelas', escola: 'EM Eloy Ornelas', senha: 'eloy@2025' },
-    // 'em.etelviramartins': { role: 'escola', label: 'EM Etelvira Martins Medeiros', escola: 'EM Etelvira Martins Medeiros', senha: 'etelvira@2025' },
-    // 'em.farolsa': { role: 'escola', label: 'EM Farol de São Tomé', escola: 'EM Farol de São Tomé', senha: 'farol@2025' },
-    // 'em.fazendaaleluia': { role: 'escola', label: 'EM Fazenda Aleluia', escola: 'EM Fazenda Aleluia', senha: 'fazenda@2025' },
-    // 'em.fazendachalita': { role: 'escola', label: 'EM Fazenda Chalita', escola: 'EM Fazenda Chalita', senha: 'fazenda@2025' },
-    // 'em.felicio': { role: 'escola', label: 'EM Felício Sarlo', escola: 'EM Felício Sarlo', senha: 'feli@2025' },
-    // 'em.ferroviario': { role: 'escola', label: 'EM Ferroviário Jacy da Silva Barbeto', escola: 'EM Ferroviário Jacy da Silva Barbeto', senha: 'ferrovia@2025' },
-    // 'em.franciscofaria': { role: 'escola', label: 'EM Francisco Faria Barbosa', escola: 'EM Francisco Faria Barbosa', senha: 'francisco@2025' },
-    // 'em.franciscoribeiro': { role: 'escola', label: 'EM Francisco Ribeiro Siqueira', escola: 'EM Francisco Ribeiro Siqueira', senha: 'francisco@2025' },
-    // 'em.franciscoricardo': { role: 'escola', label: 'EM Francisco Ricardo Lysandro de Albernaz Santos (KM 15)', escola: 'EM Francisco Ricardo Lysandro de Albernaz Santos (KM 15)', senha: 'francisco@2025' },
-    // 'em.franciscoricardo1': { role: 'escola', label: 'EM Francisco Ricardo Lysandro de Albernaz Santos (Mundéus)', escola: 'EM Francisco Ricardo Lysandro de Albernaz Santos (Mundéus)', senha: 'francisco@2025' },
-    // 'em.franciscoassis': { role: 'escola', label: 'EM Francisco de Assis - Sala de Recursos', escola: 'EM Francisco de Assis - Sala de Recursos', senha: 'francisco@2025' },
-    // 'em.fredericopaes': { role: 'escola', label: 'EM Frederico Paes Barbosa', escola: 'EM Frederico Paes Barbosa', senha: 'frederico@2025' },
-    // 'em.genesio': { role: 'escola', label: 'EM Genésio Viana', escola: 'EM Genésio Viana', senha: 'gene@2025' },
-    // 'em.gervasio': { role: 'escola', label: 'EM Gervásio Vasconcelos Cordeiro', escola: 'EM Gervásio Vasconcelos Cordeiro', senha: 'gerva@2025' },
-    // 'em.goncalo': { role: 'escola', label: 'EM Gonçalo Francisco Nunes', escola: 'EM Gonçalo Francisco Nunes', senha: 'gonc@2025' },
-    // 'em.guiomarramos': { role: 'escola', label: 'EM Guiomar Ramos Paes', escola: 'EM Guiomar Ramos Paes', senha: 'guiomar@2025' },
-    // 'em.heitoralves': { role: 'escola', label: 'EM Heitor Alves Barreto', escola: 'EM Heitor Alves Barreto', senha: 'heitor@2025' },
-    // 'em.helenamachado': { role: 'escola', label: 'EM Helena Machado de Oliveira', escola: 'EM Helena Machado de Oliveira', senha: 'helena@2025' },
-    // 'em.ignacio': { role: 'escola', label: 'EM Ignácio Corrêa dos Santos', escola: 'EM Ignácio Corrêa dos Santos', senha: 'igna@2025' },
-    // 'em.iniciacagri': { role: 'escola', label: 'EM Iniciação Agrícola José Francisco Mota Vasconcelos', escola: 'EM Iniciação Agrícola José Francisco Mota Vasconcelos', senha: 'iniciac@2025' },
-    // 'em.institutoprofissional': { role: 'escola', label: 'EM Instituto Profissional São José', escola: 'EM Instituto Profissional São José', senha: 'instituto@2025' },
-    // 'em.isabelmaria': { role: 'escola', label: 'EM Isabel Maria Polônio', escola: 'EM Isabel Maria Polônio', senha: 'isabel@2025' },
-    // 'em.jacquesricher': { role: 'escola', label: 'EM Jacques Richer', escola: 'EM Jacques Richer', senha: 'jacques@2025' },
-    // 'em.jardiminfa': { role: 'escola', label: 'EM Jardim de Infância Alva Doralice Ribeiro de Castro', escola: 'EM Jardim de Infância Alva Doralice Ribeiro de Castro', senha: 'jardim@2025' },
-    // 'em.joanirsanguedo': { role: 'escola', label: 'EM Joanir Sanguedo Boynard', escola: 'EM Joanir Sanguedo Boynard', senha: 'joanir@2025' },
-    // 'em.joabatista': { role: 'escola', label: 'EM João Batista de Azeredo', escola: 'EM João Batista de Azeredo', senha: 'joa@2025' },
-    // 'em.joaborges': { role: 'escola', label: 'EM João Borges Barreto', escola: 'EM João Borges Barreto', senha: 'joa@2025' },
-    // 'em.joacarlos': { role: 'escola', label: 'EM João Carlos de Castro', escola: 'EM João Carlos de Castro', senha: 'joa@2025' },
-    // 'em.joagoulart': { role: 'escola', label: 'EM João Goulart', escola: 'EM João Goulart', senha: 'joa@2025' },
-    // 'em.josecarneiro': { role: 'escola', label: 'EM José Carneiro Terra', escola: 'EM José Carneiro Terra', senha: 'jose@2025' },
-    // 'em.josegiro': { role: 'escola', label: 'EM José Giró Faisca', escola: 'EM José Giró Faisca', senha: 'jose@2025' },
-    // 'em.josemanoel': { role: 'escola', label: 'EM José Manoel da Silva', escola: 'EM José Manoel da Silva', senha: 'jose@2025' },
-    // 'em.josechagas': { role: 'escola', label: 'EM José das Chagas Pinto', escola: 'EM José das Chagas Pinto', senha: 'jose@2025' },
-    // 'em.joseanchieta': { role: 'escola', label: 'EM José de Anchieta', escola: 'EM José de Anchieta', senha: 'jose@2025' },
-    // 'em.joseazevedo': { role: 'escola', label: 'EM José de Azevedo', escola: 'EM José de Azevedo', senha: 'jose@2025' },
-    // 'em.josepatroci': { role: 'escola', label: 'EM José do Patrocínio', escola: 'EM José do Patrocínio', senha: 'jose@2025' },
-    // 'em.leandrosouza': { role: 'escola', label: 'EM Leandro de Souza Gomes', escola: 'EM Leandro de Souza Gomes', senha: 'leandro@2025' },
-    // 'em.leopoldinomaria': { role: 'escola', label: 'EM Leopoldino Maria', escola: 'EM Leopoldino Maria', senha: 'leopoldino@2025' },
-    // 'em.leoncio': { role: 'escola', label: 'EM Leôncio Pereira Gomes', escola: 'EM Leôncio Pereira Gomes', senha: 'leo@2025' },
-    // 'em.lionsgoitaca': { role: 'escola', label: 'EM Lions Goitacá_Educação Especial', escola: 'EM Lions Goitacá_Educação Especial', senha: 'lions@2025' },
-    // 'em.lions': { role: 'escola', label: 'EM Lions I ', escola: 'EM Lions I ', senha: 'lions@2025' },
-    // 'em.lionsii': { role: 'escola', label: 'EM Lions II', escola: 'EM Lions II', senha: 'lions@2025' },
-    // 'em.lidia': { role: 'escola', label: 'EM Lídia Leitão de Albernaz', escola: 'EM Lídia Leitão de Albernaz', senha: 'li@2025' },
-    // 'em.luiscarlos': { role: 'escola', label: 'EM Luis Carlos de Lacerda', escola: 'EM Luis Carlos de Lacerda', senha: 'luis@2025' },
-    // 'em.luizmonteiro': { role: 'escola', label: 'EM Luiz Monteiro Barbosa', escola: 'EM Luiz Monteiro Barbosa', senha: 'luiz@2025' },
-    // 'em.luloferreira': { role: 'escola', label: 'EM Lulo Ferreira de Araújo', escola: 'EM Lulo Ferreira de Araújo', senha: 'lulo@2025' },
-    // 'em.manoelcoelho': { role: 'escola', label: 'EM Manoel Coelho', escola: 'EM Manoel Coelho', senha: 'manoel@2025' },
-    // 'em.manoelcorre': { role: 'escola', label: 'EM Manoel Corrêa Gonçalves', escola: 'EM Manoel Corrêa Gonçalves', senha: 'manoel@2025' },
-    // 'em.manoelpereira': { role: 'escola', label: 'EM Manoel Pereira Gonçalves', escola: 'EM Manoel Pereira Gonçalves', senha: 'manoel@2025' },
-    // 'em.manoelribeiro': { role: 'escola', label: 'EM Manoel Ribeiro do Nascimento', escola: 'EM Manoel Ribeiro do Nascimento', senha: 'manoel@2025' },
-    // 'em.manoelsimo': { role: 'escola', label: 'EM Manoel Simões de Rezende', escola: 'EM Manoel Simões de Rezende', senha: 'manoel@2025' },
-    // 'em.marechalartur': { role: 'escola', label: 'EM Marechal Artur da Costa e Silva', escola: 'EM Marechal Artur da Costa e Silva', senha: 'marechal@2025' },
-    // 'em.mariaanto': { role: 'escola', label: 'EM Maria Antônia Pessanha Trindade', escola: 'EM Maria Antônia Pessanha Trindade', senha: 'maria@2025' },
-    // 'em.mariaarlete': { role: 'escola', label: 'EM Maria Arlete Azevedo Araújo', escola: 'EM Maria Arlete Azevedo Araújo', senha: 'maria@2025' },
-    // 'em.mariacordeiro': { role: 'escola', label: 'EM Maria Cordeiro Borges', escola: 'EM Maria Cordeiro Borges', senha: 'maria@2025' },
-    // 'em.marialu': { role: 'escola', label: 'EM Maria Lúcia', escola: 'EM Maria Lúcia', senha: 'maria@2025' },
-    // 'em.mariaqueiroz': { role: 'escola', label: 'EM Maria Queiroz de Oliveira', escola: 'EM Maria Queiroz de Oliveira', senha: 'maria@2025' },
-    // 'em.mariobarroso': { role: 'escola', label: 'EM Mario Barroso', escola: 'EM Mario Barroso', senha: 'mario@2025' },
-    // 'em.marlenehenriques': { role: 'escola', label: 'EM Marlene Henriques Alves', escola: 'EM Marlene Henriques Alves', senha: 'marlene@2025' },
-    // 'em.miguelhenrique': { role: 'escola', label: 'EM Miguel Henrique Gomes', escola: 'EM Miguel Henrique Gomes', senha: 'miguel@2025' },
-    // 'em.nacgoitaca': { role: 'escola', label: 'EM Nação Goitacá', escola: 'EM Nação Goitacá', senha: 'nac@2025' },
-    // 'em.nossasenhora': { role: 'escola', label: 'EM Nossa Senhora Aparecida', escola: 'EM Nossa Senhora Aparecida', senha: 'nossa@2025' },
-    // 'em.nossasenhora1': { role: 'escola', label: 'EM Nossa Senhora da Conceição', escola: 'EM Nossa Senhora da Conceição', senha: 'nossa@2025' },
-    // 'em.olavoalves': { role: 'escola', label: 'EM Olavo Alves Saldanha Filho', escola: 'EM Olavo Alves Saldanha Filho', senha: 'olavo@2025' },
-    // 'em.olimpio': { role: 'escola', label: 'EM Olímpio Honório de Almeida', escola: 'EM Olímpio Honório de Almeida', senha: 'oli@2025' },
-    // 'em.olimpio1': { role: 'escola', label: 'EM Olímpio Peixoto Sampaio', escola: 'EM Olímpio Peixoto Sampaio', senha: 'oli@2025' },
-    // 'em.pedrobarbosa': { role: 'escola', label: 'EM Pedro Barbosa', escola: 'EM Pedro Barbosa', senha: 'pedro@2025' },
-    // 'em.pequenofrederico': { role: 'escola', label: 'EM Pequeno Frederico', escola: 'EM Pequeno Frederico', senha: 'pequeno@2025' },
-    // 'em.pequenojornaleiro': { role: 'escola', label: 'EM Pequeno Jornaleiro', escola: 'EM Pequeno Jornaleiro', senha: 'pequeno@2025' },
-    // 'em.pontapalha': { role: 'escola', label: 'EM Ponta da Palha', escola: 'EM Ponta da Palha', senha: 'ponta@2025' },
-    // 'em.possemeio': { role: 'escola', label: 'EM Posse do Meio', escola: 'EM Posse do Meio', senha: 'posse@2025' },
-    // 'em.presidentecastelo': { role: 'escola', label: 'EM Presidente Castelo Branco', escola: 'EM Presidente Castelo Branco', senha: 'presidente@2025' },
-    // 'em.priscoalmeida': { role: 'escola', label: 'EM Prisco de Almeida', escola: 'EM Prisco de Almeida', senha: 'prisco@2025' },
-    // 'em.carlosbruno': { role: 'escola', label: 'EM Prof. Carlos Bruno', escola: 'EM Prof. Carlos Bruno', senha: 'carlos@2025' },
-    // 'em.darcyribeiro': { role: 'escola', label: 'EM Prof. Darcy Ribeiro', escola: 'EM Prof. Darcy Ribeiro', senha: 'darcy@2025' },
-    // 'em.fernandoandrade': { role: 'escola', label: 'EM Prof. Fernando de Andrade', escola: 'EM Prof. Fernando de Andrade', senha: 'fernando@2025' },
-    // 'em.paulofreire': { role: 'escola', label: 'EM Prof. Paulo Freire', escola: 'EM Prof. Paulo Freire', senha: 'paulo@2025' },
-    // 'em.waltersiqueira': { role: 'escola', label: 'EM Prof. Walter Siqueira', escola: 'EM Prof. Walter Siqueira', senha: 'walter@2025' },
-    // 'em.eleonorasilva': { role: 'escola', label: 'EM Prof.ª Eleonora Silva Pinto Viana', escola: 'EM Prof.ª Eleonora Silva Pinto Viana', senha: 'eleonora@2025' },
-    // 'em.eunicia': { role: 'escola', label: 'EM Prof.ª Eunícia Ferreira da Silva', escola: 'EM Prof.ª Eunícia Ferreira da Silva', senha: 'euni@2025' },
-    // 'em.mariangela': { role: 'escola', label: 'EM Prof.ª Maria Ângela Moreira Pinto', escola: 'EM Prof.ª Maria Ângela Moreira Pinto', senha: 'maria@2025' },
-    // 'em.olgalinhares': { role: 'escola', label: 'EM Prof.ª Olga Linhares Correa', escola: 'EM Prof.ª Olga Linhares Correa', senha: 'olga@2025' },
-    // 'em.wilmarcava': { role: 'escola', label: 'EM Prof.ª Wilmar Cava Barros', escola: 'EM Prof.ª Wilmar Cava Barros', senha: 'wilmar@2025' },
-    // 'em.raymundosoares': { role: 'escola', label: 'EM Raymundo Soares Filho', escola: 'EM Raymundo Soares Filho', senha: 'raymundo@2025' },
-    // 'em.rotary': { role: 'escola', label: 'EM Rotary I', escola: 'EM Rotary I', senha: 'rotary@2025' },
-    // 'em.sagradafami': { role: 'escola', label: 'EM Sagrada Família', escola: 'EM Sagrada Família', senha: 'sagrada@2025' },
-    // 'em.salvadorbenzi': { role: 'escola', label: 'EM Salvador Benzi', escola: 'EM Salvador Benzi', senha: 'salvador@2025' },
-    // 'em.santaba': { role: 'escola', label: 'EM Santa Bárbara', escola: 'EM Santa Bárbara', senha: 'santa@2025' },
-    // 'em.santamaria': { role: 'escola', label: 'EM Santa Maria', escola: 'EM Santa Maria', senha: 'santa@2025' },
-    // 'em.santarita': { role: 'escola', label: 'EM Santa Rita de Cássia', escola: 'EM Santa Rita de Cássia', senha: 'santa@2025' },
-    // 'em.santaterezinha': { role: 'escola', label: 'EM Santa Terezinha', escola: 'EM Santa Terezinha', senha: 'santa@2025' },
-    // 'em.santoamaro': { role: 'escola', label: 'EM Santo Amaro', escola: 'EM Santo Amaro', senha: 'santo@2025' },
-    // 'em.santoanto': { role: 'escola', label: 'EM Santo Antônio', escola: 'EM Santo Antônio', senha: 'santo@2025' },
-    // 'em.sebastiaribeiro': { role: 'escola', label: 'EM Sebastião Ribeiro de Deus', escola: 'EM Sebastião Ribeiro de Deus', senha: 'sebastia@2025' },
-    // 'em.sebastiaviveiros': { role: 'escola', label: 'EM Sebastião Viveiros de Vasconcelos', escola: 'EM Sebastião Viveiros de Vasconcelos', senha: 'sebastia@2025' },
-    // 'em.senadorjose': { role: 'escola', label: 'EM Senador José Carlos Pereira Pinto', escola: 'EM Senador José Carlos Pereira Pinto', senha: 'senador@2025' },
-    // 'em.senadortarci': { role: 'escola', label: 'EM Senador Tarcísio Miranda', escola: 'EM Senador Tarcísio Miranda', senha: 'senador@2025' },
-    // 'em.sesmaria': { role: 'escola', label: 'EM Sesmaria', escola: 'EM Sesmaria', senha: 'sesmaria@2025' },
-    // 'em.sergio': { role: 'escola', label: 'EM Sérgio Viana Barroso', escola: 'EM Sérgio Viana Barroso', senha: 'se@2025' },
-    // 'em.tarcilio': { role: 'escola', label: 'EM Tarcílio Siqueira Cordeiro', escola: 'EM Tarcílio Siqueira Cordeiro', senha: 'tarci@2025' },
-    // 'em.thierryhomero': { role: 'escola', label: 'EM Thierry Homero Ribeiro Gomes', escola: 'EM Thierry Homero Ribeiro Gomes', senha: 'thierry@2025' },
   };
 
   let currentRole   = null;
@@ -1874,55 +1904,37 @@
   }
 
   async function doLogin() {
-    const user = document.getElementById('loginUser').value.trim();
-    const pwd  = document.getElementById('loginInput').value;
+    const pwd = document.getElementById('loginInput').value;
 
-    // Admin usa só senha (campo usuário ignorado se senha bater)
-    let userObj = null;
-    if (pwd === 'admin123') {
-      userObj = USERS['admin123'];
-    } else {
-      const entry = USERS[user];
-      if (entry && entry.senha === pwd) userObj = entry;
-    }
-
-    if (!userObj) {
+    if (pwd !== 'admin123') {
       document.getElementById('loginError').classList.add('show');
       document.getElementById('loginInput').value = '';
       document.getElementById('loginInput').focus();
       return;
     }
 
-    currentRole   = userObj.role;
-    currentSchool = userObj.escola;
+    currentRole   = 'admin';
+    currentSchool = null;
 
+    // Fecha o overlay imediatamente — não espera o fetch terminar
     document.getElementById('loginOverlay').style.display = 'none';
-    document.getElementById('userLabel').textContent = userObj.label;
-    document.getElementById('loginUser').value  = '';
+    document.getElementById('userLabel').textContent = 'Administrador';
     document.getElementById('loginInput').value = '';
     document.getElementById('loginError').classList.remove('show');
 
-    showToast('⏳ Carregando dados...');
-    await loadFromServer();
-    const isAdmin = currentRole === 'admin';
-    document.getElementById('btnClearAll').style.display = isAdmin ? 'flex' : 'none';
-    document.getElementById('btnImport').style.display   = isAdmin ? 'flex' : 'none';
-    document.getElementById('btnExport').style.display   = isAdmin ? 'flex' : 'none';
+    showToast('⏳ Carregando dados locais...');
+    try { await loadFromServer(); } catch(e) { console.error(e); }
+    document.getElementById('btnClearAll').style.display = 'flex';
+    document.getElementById('btnImport').style.display   = 'flex';
+    document.getElementById('btnSalvarHD').style.display = 'flex';
+    document.getElementById('btnPlanilhaVazia').style.display = 'flex';
 
-    // Se for usuário de escola, preenche e bloqueia o campo unidade_escolar
+
     const selectEscola = document.getElementById('unidade_escolar');
     const selectRegiao = document.getElementById('regiao');
-    if (currentSchool) {
-      selectEscola.innerHTML = `<option value="${currentSchool}">${currentSchool}</option>`;
-      selectEscola.value    = currentSchool;
-      selectEscola.disabled = true;
-      selectRegiao.value    = '';
-      selectRegiao.disabled = true;
-    } else {
-      selectRegiao.disabled = false;
-      filtrarEscolasPorRegiao(); // recarrega todas as escolas
-      selectEscola.disabled = false; // admin pode selecionar qualquer escola
-    }
+    selectRegiao.disabled = false;
+    filtrarEscolasPorRegiao();
+    selectEscola.disabled = false;
 
     renderTable();
   }
@@ -1932,12 +1944,13 @@
     currentSchool = null;
     records = [];
     document.getElementById('loginOverlay').style.display = 'flex';
-    document.getElementById('loginUser').value  = '';
     document.getElementById('loginInput').value = '';
-    document.getElementById('loginUser').focus();
+    document.getElementById('loginInput').focus();
     document.getElementById('btnClearAll').style.display = 'none';
     document.getElementById('btnImport').style.display   = 'none';
-    document.getElementById('btnExport').style.display   = 'none';
+    document.getElementById('btnSalvarHD').style.display = 'none';
+    document.getElementById('btnPlanilhaVazia').style.display = 'none';
+
     const selectEscola = document.getElementById('unidade_escolar');
     selectEscola.value    = '';
     selectEscola.disabled = true;
@@ -1945,6 +1958,30 @@
     selectRegiaoLogout.value    = '';
     selectRegiaoLogout.disabled = false;
     document.getElementById('tableArea').innerHTML = '<div class="empty-state">Nenhum registro adicionado ainda.</div>';
+  }
+
+  // ── Controle de salvamento manual ─────────────────
+  let _pendente = false;
+
+  function marcarPendente() {
+    _pendente = true;
+    const btn = document.getElementById('btnSalvarHD');
+    if (btn) btn.classList.add('pendente');
+  }
+
+  function limparPendente() {
+    _pendente = false;
+    const btn = document.getElementById('btnSalvarHD');
+    if (btn) btn.classList.remove('pendente');
+  }
+
+  async function salvarHD() {
+    if (records.length === 0) {
+      showToast('⚠ Nenhum registro para salvar.');
+      return;
+    }
+    await exportXLSX(true);
+    limparPendente();
   }
 
   // ── State ──────────────────────────────────────────
@@ -1987,67 +2024,26 @@
     this.value = v;
   });
 
-  // ── JSONBin.io ─────────────────────────────────────
-  const JSONBIN_KEY = '$2a$10$UysIHXuZc3gSJiGlA..wruUCvTHTiHK7C9XVm5QHOAMGqV/ue2PFi';
-  let BIN_ID = '69d8ef25856a6821891bc936';
+  // ── Persistência local (localStorage) ─────────────
+  const STORAGE_KEY = 'siee_records';
 
   async function loadFromServer() {
-    if (!BIN_ID) return; // bin ainda não criado
     try {
-      const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
-        headers: { 'X-Master-Key': JSONBIN_KEY }
-      });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(`HTTP ${res.status}: ${err.message || 'Erro ao carregar'}`);
-      }
-      const data = await res.json();
-      records = data.record.records || [];
+      const raw = localStorage.getItem(STORAGE_KEY);
+      records = raw ? JSON.parse(raw) : [];
     } catch (e) {
-      console.error('Erro ao carregar dados:', e);
-      showToast(`⚠ Erro ao carregar dados: ${e.message}`);
+      console.error('Erro ao carregar dados locais:', e);
+      records = [];
     }
   }
 
   async function saveToServer() {
-    const body = JSON.stringify({ records });
     try {
-      if (!BIN_ID) {
-        // Cria o bin na primeira vez
-        const res = await fetch('https://api.jsonbin.io/v3/b', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-Master-Key': JSONBIN_KEY,
-            'X-Bin-Name': 'quadro-nee',
-            'X-Bin-Private': 'true'
-          },
-          body
-        });
-        if (!res.ok) {
-          const err = await res.json().catch(() => ({}));
-          throw new Error(`HTTP ${res.status}: ${err.message || 'Erro ao criar bin'}`);
-        }
-        const data = await res.json();
-        BIN_ID = data.metadata.id;
-      } else {
-        const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-Master-Key': JSONBIN_KEY
-          },
-          body
-        });
-        if (!res.ok) {
-          const err = await res.json().catch(() => ({}));
-          throw new Error(`HTTP ${res.status}: ${err.message || 'Erro ao salvar'}`);
-        }
-      }
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
     } catch (e) {
-      console.error('Erro ao salvar dados:', e);
-      showToast(`⚠ Erro ao salvar: ${e.message}`);
-      throw e; // propaga para o caller saber que falhou
+      console.error('Erro ao salvar dados locais:', e);
+      showToast('⚠ Erro ao salvar localmente.');
+      throw e;
     }
   }
 
@@ -2101,7 +2097,7 @@
 
     renderTable();
     clearForm();
-    await saveToServer();
+    marcarPendente();
   });
 
   // ── Render table ───────────────────────────────────
@@ -2273,10 +2269,10 @@
     renderTable();
   }
 
-  async function removeRecord(i) {
+  function removeRecord(i) {
     records.splice(i, 1);
     renderTable();
-    await saveToServer();
+    marcarPendente();
     showToast('🗑 Registro excluído.');
   }
 
@@ -2285,8 +2281,14 @@
     records = [];
     currentPage = 1;
     renderTable();
-    await saveToServer();
-    showToast('🗑 Todos os registros foram removidos.');
+    // Salva imediatamente no localStorage para não reaparecer ao recarregar
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+      limparPendente();
+      showToast('🗑 Todos os registros foram apagados.');
+    } catch(e) {
+      showToast('🗑 Registros removidos da tela, mas erro ao salvar localmente.');
+    }
   }
 
   function editRecord(i) {
@@ -2358,6 +2360,83 @@
   }
 
   // ── Import XLSX ────────────────────────────────────
+  // ── Importar: 1 arquivo = substitui; 2+ = une e substitui ──────────────────
+  async function importarArquivos(input) {
+    const files = Array.from(input.files);
+    if (!files.length) return;
+
+    if (files.length === 1) {
+      // Comportamento original: importa único arquivo
+      importXLSX(input);
+      return;
+    }
+
+    // Múltiplos arquivos: lê todos, une e importa
+    showToast(`⏳ Lendo ${files.length} arquivo(s)...`);
+
+    const HEADER_KEYS = ['id','unidade_escolar','regiao','cpf','aluno','data_nascimento','sexo',
+      'ordem_judicial','ano_escolaridade','turno','ano_laudo','tipo_deficiencia','caso_severo',
+      'mediador','cuidador','sala_recursos','acompanhamento_inst','necessita','situacao','inserido_por'];
+
+    let todasLinhas = [];
+    let erros = [];
+
+    for (const file of files) {
+      try {
+        const buf = await file.arrayBuffer();
+        const wb  = new ExcelJS.Workbook();
+        await wb.xlsx.load(buf);
+        let ws = wb.getWorksheet('aluno NEE') || wb.worksheets[0];
+        if (!ws) { erros.push(file.name + ': sem sheet'); continue; }
+
+        ws.eachRow({ includeEmpty: false }, (row, rowNum) => {
+          if (rowNum === 1) return;
+          const vals = row.values;
+          if (!vals || vals.length < 2) return;
+          const obj = {};
+          HEADER_KEYS.forEach((k, i) => {
+            let v = vals[i + 1];
+            if (v instanceof Date) {
+              v = v.toISOString().slice(0, 10);
+            } else if (v !== null && v !== undefined) {
+              v = String(v).trim();
+              if (k === 'data_nascimento' && v && !isNaN(parseFloat(v))) {
+                const num = parseFloat(v);
+                if (num > 1000) {
+                  const d = new Date(Math.round((num - 25569) * 86400 * 1000));
+                  if (!isNaN(d)) v = d.toISOString().slice(0, 10);
+                }
+              }
+            } else { v = ''; }
+            obj[k] = v;
+          });
+          if (Object.values(obj).every(v => !v)) return;
+          // Mapeia para o campo interno correto
+          obj.num          = obj.id || obj.num || '';
+          obj.investigacao = obj.situacao || obj.investigacao || '';
+          todasLinhas.push(obj);
+        });
+      } catch(err) {
+        erros.push(file.name + ': erro de leitura');
+        console.error(err);
+      }
+    }
+
+    if (!todasLinhas.length) {
+      showToast('⚠ Nenhum dado encontrado nos arquivos.');
+      input.value = '';
+      return;
+    }
+
+    records = todasLinhas;
+    currentPage = 1;
+    renderTable();
+    marcarPendente();
+    input.value = '';
+    const aviso = erros.length ? ` (⚠ ${erros.length} erro(s))` : '';
+    showToast(`✓ ${todasLinhas.length} registro(s) importado(s) de ${files.length} arquivo(s)${aviso}. Clique em 💾 Salvar.`);
+  }
+
   function importXLSX(input) {
     const file = input.files[0];
     if (!file) return;
@@ -2413,16 +2492,22 @@
             const rawKey = Object.keys(row).find(k => aliases.includes(k)) || col.key;
             let val = row[rawKey] !== undefined ? String(row[rawKey]) : '';
 
-            // Formata data se for objeto Date
-            if (col.key === 'data_nascimento' && row[rawKey] instanceof Date) {
-              const d = row[rawKey];
-              val = d.toISOString().slice(0, 10);
-            } else if (col.key === 'data_nascimento' && val) {
-              // Tenta converter número serial do Excel para data
-              const num = parseFloat(val);
-              if (!isNaN(num) && num > 1000) {
-                const d = new Date(Math.round((num - 25569) * 86400 * 1000));
-                val = d.toISOString().slice(0, 10);
+            // Formata data_nascimento — aceita Date, serial Excel, dd/mm/yyyy, yyyy-mm-dd
+            if (col.key === 'data_nascimento') {
+              if (row[rawKey] instanceof Date) {
+                val = row[rawKey].toISOString().slice(0, 10);
+              } else if (val) {
+                const num = parseFloat(val);
+                if (!isNaN(num) && num > 1000) {
+                  // Serial numérico do Excel (com ou sem casas decimais)
+                  const d = new Date(Math.round((num - 25569) * 86400 * 1000));
+                  if (!isNaN(d)) val = d.toISOString().slice(0, 10);
+                } else if (/^\d{2}\/\d{2}\/\d{4}$/.test(val)) {
+                  // dd/mm/yyyy → yyyy-mm-dd
+                  const [dd, mm, yyyy] = val.split('/');
+                  val = `${yyyy}-${mm}-${dd}`;
+                }
+                // yyyy-mm-dd já está no formato correto, nada a fazer
               }
             }
 
@@ -2457,7 +2542,8 @@
         records = imported;
         currentPage = 1;
         renderTable();
-        saveToServer().then(() => showToast(`✓ ${imported.length} registro(s) importado(s) e salvos!`));
+        marcarPendente();
+        showToast(`✓ ${imported.length} registro(s) importado(s). Clique em 💾 Salvar para gravar no HD.`);
       } catch (err) {
         showToast('⚠ Erro ao ler a planilha. Verifique o arquivo.');
         console.error(err);
@@ -2467,8 +2553,413 @@
     reader.readAsArrayBuffer(file);
   }
 
+  // ── Planilha Vazia por Escola ──────────────────────────────────────────────
+  let escolasSelecionadas = new Set();
+
+  function abrirModalPlanilhaVazia() {
+    escolasSelecionadas = new Set();
+    document.getElementById('modalBuscaEscola').value = '';
+    renderEscolasModal('');
+    atualizarContadorModal();
+    document.getElementById('modalPlanilhaVazia').classList.add('open');
+    setTimeout(() => document.getElementById('modalBuscaEscola').focus(), 50);
+  }
+  function fecharModalPlanilhaVazia() {
+    document.getElementById('modalPlanilhaVazia').classList.remove('open');
+  }
+  document.getElementById('modalPlanilhaVazia').addEventListener('click', function(e) {
+    if (e.target === this) fecharModalPlanilhaVazia();
+  });
+
+  // Event delegation: captura cliques em qualquer escola da lista
+  document.getElementById('escolaListWrap').addEventListener('click', function(e) {
+    const item = e.target.closest('.escola-opt');
+    if (!item) return;
+    if (item.dataset.todas) {
+      toggleTodasEscolas();
+    } else if (item.dataset.escola) {
+      toggleEscolaModal(item.dataset.escola);
+    }
+  });
+
+  function renderEscolasModal(filtro) {
+    const wrap  = document.getElementById('escolaListWrap');
+    const termo = filtro.toLowerCase().trim();
+    const lista = termo
+      ? TODAS_ESCOLAS.filter(e => e.toLowerCase().includes(termo))
+      : TODAS_ESCOLAS;
+    let html = '';
+
+    if (!termo) {
+      const sel = escolasSelecionadas.has('__TODAS__');
+      html += `<div class="escola-opt opt-todas${sel ? ' selected' : ''}" data-todas="1">
+        <div class="escola-check">${sel ? '✓' : ''}</div>
+        <span>Todas as escolas <span style="color:var(--muted);font-weight:400;font-size:.72rem;">(${TODAS_ESCOLAS.length})</span></span>
+      </div>`;
+    }
+
+    lista.forEach(escola => {
+      const sel    = escolasSelecionadas.has(escola) || escolasSelecionadas.has('__TODAS__');
+      const regNum = ESCOLA_PARA_REGIAO[escola] || '?';
+      // Escapa a escola para uso seguro no data-attribute
+      const escaped = escola.replace(/&/g,'&amp;').replace(/"/g,'&quot;');
+      html += `<div class="escola-opt${sel ? ' selected' : ''}" data-escola="${escaped}">
+        <div class="escola-check">${sel ? '✓' : ''}</div>
+        <span>${escola.replace(/&/g,'&amp;').replace(/</g,'&lt;')} <span style="color:var(--muted);font-size:.68rem;font-family:'JetBrains Mono',monospace;">· R${regNum}</span></span>
+      </div>`;
+    });
+
+    if (!lista.length) html = '<div style="padding:1rem;color:var(--muted);font-size:.82rem;text-align:center">Nenhuma escola encontrada.</div>';
+    wrap.innerHTML = html;
+  }
+
+
+  function toggleTodasEscolas() {
+    escolasSelecionadas.has('__TODAS__') ? escolasSelecionadas.clear() : (escolasSelecionadas.clear(), escolasSelecionadas.add('__TODAS__'));
+    renderEscolasModal(document.getElementById('modalBuscaEscola').value);
+    atualizarContadorModal();
+  }
+  function toggleEscolaModal(escola) {
+    escolasSelecionadas.delete('__TODAS__');
+    escolasSelecionadas.has(escola) ? escolasSelecionadas.delete(escola) : escolasSelecionadas.add(escola);
+    renderEscolasModal(document.getElementById('modalBuscaEscola').value);
+    atualizarContadorModal();
+  }
+  function filtrarEscolasModal() {
+    renderEscolasModal(document.getElementById('modalBuscaEscola').value);
+  }
+  function atualizarContadorModal() {
+    const total = escolasSelecionadas.has('__TODAS__') ? TODAS_ESCOLAS.length : escolasSelecionadas.size;
+    document.getElementById('modalSelCount').textContent = `${total} escola(s) selecionada(s)`;
+    const btn = document.getElementById('btnGerarPlanilhas');
+    btn.disabled = total === 0;
+    btn.textContent = total > 1 ? `⬇ Gerar ${total} arquivos` : total === 1 ? '⬇ Gerar 1 arquivo' : '⬇ Gerar';
+  }
+
+  function sanitizarNomeArquivo(nome) {
+    return nome.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^\w\s-]/g,'').replace(/\s+/g,'_').replace(/_+/g,'_').trim();
+  }
+
+  // Sanitiza nome para usar como nome de aba do Excel (máx 31 chars, sem /\?*[]:)
+  function sanitizarNomeAba(nome, wb) {
+    const base = nome
+      .replace(/[\/\\?*\[\]:]/g, '')
+      .trim()
+      .slice(0, 31);
+    if (!wb) return base;
+    const existentes = new Set(wb.worksheets.map(s => s.name));
+    if (!existentes.has(base)) return base;
+    for (let i = 2; i < 999; i++) {
+      const sufixo = '_' + i;
+      const candidato = base.slice(0, 31 - sufixo.length) + sufixo;
+      if (!existentes.has(candidato)) return candidato;
+    }
+    return base;
+  }
+
+  // Adiciona uma sheet formatada para uma escola no workbook
+  function _adicionarSheetEscola(wb, nomeEscola) {
+    const nomeAba = sanitizarNomeAba(nomeEscola, wb);
+    const ws = wb.addWorksheet(nomeAba);
+    ws.columns = [
+      { key:'id', width:16 }, { key:'unidade_escolar', width:41.57 }, { key:'regiao', width:30.0 },
+      { key:'cpf', width:19.43 }, { key:'aluno', width:25.86 }, { key:'data_nascimento', width:17.71 },
+      { key:'sexo', width:12.0 }, { key:'ordem_judicial', width:11.43 }, { key:'ano_escolaridade', width:9.86 },
+      { key:'turno', width:10.43 }, { key:'ano_laudo', width:9.86 }, { key:'tipo_deficiencia', width:41.57 },
+      { key:'caso_severo', width:8.43 }, { key:'mediador', width:22.0 }, { key:'cuidador', width:16.57 },
+      { key:'sala_recursos', width:9.0 }, { key:'acompanhamento_inst', width:8.29 }, { key:'necessita', width:41.57 },
+      { key:'situacao', width:12.0 }, { key:'inserido_por', width:22.0 },
+    ];
+    const headerLabels = ['id','unidade_escolar','regiao','cpf','aluno','data_nascimento','sexo','ordem_judicial',
+      'ano_escolaridade','turno','ano_laudo','tipo_deficiencia','caso_severo','mediador','cuidador',
+      'sala_recursos','acompanhamento_inst','necessita','situacao','inserido_por'];
+    const styleLight = { font:{bold:true,size:12,color:{argb:'FF000000'}}, fill:{type:'pattern',pattern:'solid',fgColor:{argb:'FFDBE5F1'}}, alignment:{horizontal:'center',vertical:'middle',wrapText:true}, border:{bottom:{style:'thin',color:{argb:'FF000000'}}} };
+    const styleDark  = { font:{bold:true,size:10,color:{argb:'FFFFFFFF'}}, fill:{type:'pattern',pattern:'solid',fgColor:{argb:'FF2E6EA6'}}, alignment:{horizontal:'center',vertical:'middle',wrapText:true}, border:{top:{style:'thin',color:{argb:'FF000000'}}} };
+    const darkCols = new Set([1,2,18]);
+    const headerRow = ws.addRow(headerLabels);
+    headerRow.height = 48;
+    headerRow.eachCell((cell, colNum) => { Object.assign(cell, darkCols.has(colNum) ? styleDark : styleLight); });
+    ws.autoFilter = { from:'A1', to:'T1' };
+    ws.views = [{ state:'frozen', ySplit:1 }];
+    const validations = [
+      { sqref:'B2:B500', formula:"'Listas'!$A$2:$A$50" },
+      { sqref:'G2:G500', formula:'"Masculino,Feminino"' },
+      { sqref:'H2:H500', formula:"'Listas'!$B$2:$B$10" },
+      { sqref:'I2:I500', formula:"'Listas'!$C$2:$C$30" },
+      { sqref:'J2:J500', formula:"'Listas'!$D$2:$D$10" },
+      { sqref:'K2:K500', formula:"'Listas'!$E$2:$E$20" },
+      { sqref:'L2:L500', formula:"'Listas'!$F$2:$F$30" },
+      { sqref:'M2:M500', formula:"'Listas'!$G$2:$G$10" },
+      { sqref:'N2:N500', formula:"'Listas'!$H$2:$H$20" },
+      { sqref:'O2:O500', formula:"'Listas'!$H$2:$H$20" },
+      { sqref:'P2:Q500', formula:"'Listas'!$I$2:$I$10" },
+      { sqref:'R2:R500', formula:"'Listas'!$J$2:$J$20" },
+      { sqref:'S2:S500', formula:"'Listas'!$K$2:$K$10" },
+    ];
+    validations.forEach(({ sqref, formula }) => {
+      ws.dataValidations.add(sqref, { type:'list', allowBlank:true, formulae:[formula], showDropDown:false, showErrorMessage:false });
+    });
+    ws.dataValidations.add('F2:F500', { type:'date', operator:'greaterThan', allowBlank:true, formulae:[new Date(2000,0,1)], showErrorMessage:false });
+  }
+
+  async function gerarPlanilhasVazias() {
+    let escolas;
+    if (escolasSelecionadas.has('__TODAS__')) {
+      escolas = Object.keys(ESCOLAS_POR_REGIAO).sort().flatMap(r => ESCOLAS_POR_REGIAO[r]);
+    } else {
+      const sel = escolasSelecionadas;
+      escolas = Object.keys(ESCOLAS_POR_REGIAO).sort().flatMap(r => ESCOLAS_POR_REGIAO[r].filter(e => sel.has(e)));
+    }
+    if (!escolas.length) return;
+
+    fecharModalPlanilhaVazia();
+    showToast(`⏳ Gerando ${escolas.length} arquivo(s)...`);
+
+    try {
+      for (let i = 0; i < escolas.length; i++) {
+        const escola = escolas[i];
+        const wb = new ExcelJS.Workbook();
+        _adicionarSheetEscola(wb, escola);
+        await _adicionarSheetListas(wb);
+        const buf  = await wb.xlsx.writeBuffer();
+        const blob = new Blob([buf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        const url  = URL.createObjectURL(blob);
+        const a    = document.createElement('a');
+        a.href     = url;
+        const numReg = ESCOLA_PARA_REGIAO[escola] || '0';
+        a.download = `SIEE_R${numReg}_${sanitizarNomeArquivo(escola)}.xlsx`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        // Intervalo entre downloads para o browser não engasgar
+        if (i < escolas.length - 1) await new Promise(r => setTimeout(r, 300));
+      }
+      showToast(`✓ ${escolas.length} arquivo(s) gerado(s)!`);
+    } catch(err) {
+      console.error(err);
+      showToast(`⚠ Erro: ${err.message || err}`);
+    }
+  }
+
+
+  function _adicionarSheetListas(wb) {
+    const ws2 = wb.addWorksheet('Listas');
+    const listas = {
+      Escolas: TODAS_ESCOLAS.slice(0, 226),
+      OrdemJudicial: ['Sim','Não'],
+      AnoEscolaridade: ['Berçário','G1','G2','G3','Pré I','Pré II','1º ano','2º ano','3º ano','4º ano','5º ano','6º ano','7º ano','8º ano','9º ano'],
+      Turno: ['Manhã','Tarde','Integral'],
+      AnoLaudo: [2019,2020,2021,2022,2023,2024,2025,2026],
+      TipoDeficiencia: ['Autismo - F84.0','TDAH - F90.0','Deficiência Física - Z73','Deficiência Visual - H54','Deficiência Auditiva - H90','Deficiência Intelectual - F79','Transtorno Opositor - F91.3','Paralisia Cerebral - G80','Síndrome de Down - Q90'],
+      CasoSevero: ['Sim','Não'],
+      NomesApoio: ['Maria Clara Nunes','Tereza Lima','Rosângela Ferreira','Carlos Henrique Souza','Patrícia Oliveira','Juliana Alves','Fernanda Costa','André Martins'],
+      SimNao: ['Sim','Não'],
+      Necessita: ['Mediação escolar','Apoio psicopedagógico','Intérprete de Libras','Cuidador','Sala de Recursos','Acompanhamento terapêutico'],
+      Investigacao: ['Com laudo','Estudo']
+    };
+    const listKeys = Object.keys(listas);
+    ws2.addRow(listKeys);
+    ws2.columns = listKeys.map(() => ({ width:24 }));
+    const maxLen = Math.max(...Object.values(listas).map(a => a.length));
+    for (let i = 0; i < maxLen; i++) ws2.addRow(listKeys.map(h => listas[h][i] !== undefined ? listas[h][i] : ''));
+  }
+
+  // ── Juntar Planilhas ────────────────────────────────────────────────────────
+  let arquivosParaJuntar = [];
+
+  function abrirModalJuntar() {
+    arquivosParaJuntar = [];
+    document.getElementById('inputArquivosJuntar').value = '';
+    renderArquivosSelecionados();
+    document.getElementById('modalJuntarPlanilhas').classList.add('open');
+  }
+  function fecharModalJuntar() {
+    document.getElementById('modalJuntarPlanilhas').classList.remove('open');
+  }
+  document.getElementById('modalJuntarPlanilhas').addEventListener('click', function(e) {
+    if (e.target === this) fecharModalJuntar();
+  });
+
+  function onDragOver(e) {
+    e.preventDefault();
+    document.getElementById('dropZone').classList.add('dragover');
+  }
+  function onDragLeave(e) {
+    document.getElementById('dropZone').classList.remove('dragover');
+  }
+  function onDrop(e) {
+    e.preventDefault();
+    document.getElementById('dropZone').classList.remove('dragover');
+    const files = Array.from(e.dataTransfer.files).filter(f => f.name.endsWith('.xlsx'));
+    adicionarArquivos(files);
+  }
+  function onArquivosSelecionados(fileList) {
+    adicionarArquivos(Array.from(fileList));
+  }
+  function adicionarArquivos(files) {
+    const nomes = arquivosParaJuntar.map(f => f.name);
+    files.forEach(f => { if (!nomes.includes(f.name)) arquivosParaJuntar.push(f); });
+    renderArquivosSelecionados();
+  }
+  function removerArquivo(idx) {
+    arquivosParaJuntar.splice(idx, 1);
+    renderArquivosSelecionados();
+  }
+  function renderArquivosSelecionados() {
+    const wrap = document.getElementById('arquivosSelecionados');
+    const cnt  = document.getElementById('juntarSelCount');
+    const btn  = document.getElementById('btnExecutarJuntar');
+    cnt.textContent = `${arquivosParaJuntar.length} arquivo(s)`;
+    btn.disabled = arquivosParaJuntar.length < 2;
+    btn.textContent = arquivosParaJuntar.length >= 2 ? `🔗 Juntar ${arquivosParaJuntar.length} arquivos` : '🔗 Juntar';
+    if (!arquivosParaJuntar.length) { wrap.style.display = 'none'; return; }
+    wrap.style.display = 'flex';
+    wrap.innerHTML = arquivosParaJuntar.map((f, i) =>
+      `<div class="arquivo-item">
+        <span class="arquivo-nome" title="${f.name}">📄 ${f.name}</span>
+        <button class="arquivo-remove" onclick="removerArquivo(${i})" title="Remover">✕</button>
+      </div>`
+    ).join('');
+  }
+
+  async function executarJuntar() {
+    if (arquivosParaJuntar.length < 2) return;
+    fecharModalJuntar();
+    showToast(`⏳ Lendo ${arquivosParaJuntar.length} arquivos...`);
+
+    // Cabeçalhos esperados (mesmos do SIEE)
+    const HEADER_KEYS = ['id','unidade_escolar','regiao','cpf','aluno','data_nascimento','sexo',
+      'ordem_judicial','ano_escolaridade','turno','ano_laudo','tipo_deficiencia','caso_severo',
+      'mediador','cuidador','sala_recursos','acompanhamento_inst','necessita','situacao','inserido_por'];
+
+    let todasLinhas = [];
+    let erros = [];
+
+    for (const file of arquivosParaJuntar) {
+      try {
+        const buf = await file.arrayBuffer();
+        const wb  = new ExcelJS.Workbook();
+        await wb.xlsx.load(buf);
+
+        // Pega a primeira sheet (ou a chamada 'aluno NEE')
+        let ws = wb.getWorksheet('aluno NEE') || wb.worksheets[0];
+        if (!ws) { erros.push(file.name + ': sem sheet'); continue; }
+
+        // Lê linhas — ignora linha 1 (cabeçalho)
+        let linhasArquivo = 0;
+        ws.eachRow({ includeEmpty: false }, (row, rowNum) => {
+          if (rowNum === 1) return; // cabeçalho
+          const vals = row.values; // índice 1-based
+          if (!vals || vals.length < 2) return;
+          // Monta objeto com as 20 colunas
+          const obj = {};
+          HEADER_KEYS.forEach((k, i) => {
+            let v = vals[i + 1]; // +1 pq row.values é 1-based
+            if (v instanceof Date) {
+              v = v.toISOString().slice(0,10);
+            } else if (v !== null && v !== undefined) {
+              v = String(v).trim();
+              // Converte serial numérico de data para yyyy-mm-dd
+              if (HEADER_KEYS[i] === 'data_nascimento' && v && !isNaN(parseFloat(v))) {
+                const num = parseFloat(v);
+                if (num > 1000) {
+                  const d = new Date(Math.round((num - 25569) * 86400 * 1000));
+                  if (!isNaN(d)) v = d.toISOString().slice(0,10);
+                }
+              }
+            } else {
+              v = '';
+            }
+            obj[k] = v;
+          });
+          // Pula linhas completamente vazias
+          if (Object.values(obj).every(v => !v)) return;
+          todasLinhas.push(obj);
+          linhasArquivo++;
+        });
+      } catch(err) {
+        erros.push(file.name + ': erro de leitura');
+        console.error(err);
+      }
+    }
+
+    if (!todasLinhas.length) {
+      showToast('⚠ Nenhum dado encontrado nos arquivos.');
+      return;
+    }
+
+    showToast(`⏳ Montando planilha unificada (${todasLinhas.length} linhas)...`);
+
+    // Gera o arquivo unificado com a mesma formatação
+    const wbOut = new ExcelJS.Workbook();
+    const wsOut = wbOut.addWorksheet('aluno NEE');
+
+    wsOut.columns = [
+      { key:'id', width:16 }, { key:'unidade_escolar', width:41.57 }, { key:'regiao', width:30.0 },
+      { key:'cpf', width:19.43 }, { key:'aluno', width:25.86 }, { key:'data_nascimento', width:17.71 },
+      { key:'sexo', width:12.0 }, { key:'ordem_judicial', width:11.43 }, { key:'ano_escolaridade', width:9.86 },
+      { key:'turno', width:10.43 }, { key:'ano_laudo', width:9.86 }, { key:'tipo_deficiencia', width:41.57 },
+      { key:'caso_severo', width:8.43 }, { key:'mediador', width:22.0 }, { key:'cuidador', width:16.57 },
+      { key:'sala_recursos', width:9.0 }, { key:'acompanhamento_inst', width:8.29 }, { key:'necessita', width:41.57 },
+      { key:'situacao', width:12.0 }, { key:'inserido_por', width:22.0 },
+    ];
+
+    const headerLabels = ['id','unidade_escolar','regiao','cpf','aluno','data_nascimento','sexo','ordem_judicial',
+      'ano_escolaridade','turno','ano_laudo','tipo_deficiencia','caso_severo','mediador','cuidador',
+      'sala_recursos','acompanhamento_inst','necessita','situacao','inserido_por'];
+
+    const styleLight = { font:{bold:true,size:12,color:{argb:'FF000000'}}, fill:{type:'pattern',pattern:'solid',fgColor:{argb:'FFDBE5F1'}}, alignment:{horizontal:'center',vertical:'middle',wrapText:true}, border:{bottom:{style:'thin',color:{argb:'FF000000'}}} };
+    const styleDark  = { font:{bold:true,size:10,color:{argb:'FFFFFFFF'}}, fill:{type:'pattern',pattern:'solid',fgColor:{argb:'FF2E6EA6'}}, alignment:{horizontal:'center',vertical:'middle',wrapText:true}, border:{top:{style:'thin',color:{argb:'FF000000'}}} };
+    const darkCols = new Set([1,2,18]);
+
+    const hRow = wsOut.addRow(headerLabels);
+    hRow.height = 48;
+    hRow.eachCell((cell, colNum) => { Object.assign(cell, darkCols.has(colNum) ? styleDark : styleLight); });
+
+    wsOut.autoFilter = { from:'A1', to:'T1' };
+    wsOut.views = [{ state:'frozen', ySplit:1 }];
+
+    todasLinhas.forEach(obj => {
+      const rowData = HEADER_KEYS.map(k => {
+        const v = obj[k] || '';
+        if (k === 'data_nascimento' && v) {
+          // Grava como string dd/mm/yyyy para evitar serial numérico no xlsx gerado
+          const d = new Date(v);
+          if (!isNaN(d)) {
+            const dd = String(d.getUTCDate()).padStart(2,'0');
+            const mm = String(d.getUTCMonth()+1).padStart(2,'0');
+            return `${dd}/${mm}/${d.getUTCFullYear()}`;
+          }
+          return v;
+        }
+        if (k === 'ano_laudo') { const n = parseInt(v); return isNaN(n) ? v : n; }
+        return v;
+      });
+      const dr = wsOut.addRow(rowData);
+      dr.getCell(1).alignment = { horizontal:'center', vertical:'center' };
+      dr.getCell(6).numFmt = 'dd/mm/yyyy';
+    });
+
+    await _adicionarSheetListas(wbOut);
+
+    const buf = await wbOut.xlsx.writeBuffer();
+    const blob = new Blob([buf], { type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `SIEE_Unificado_${new Date().toISOString().slice(0,10)}.xlsx`;
+    a.click();
+    URL.revokeObjectURL(url);
+
+    const msg = erros.length
+      ? `✓ Unificado! ${todasLinhas.length} linhas. ⚠ ${erros.length} erro(s).`
+      : `✓ Planilha unificada! ${todasLinhas.length} linha(s) de ${arquivosParaJuntar.length} arquivo(s).`;
+    showToast(msg);
+  }
+
   // ── Export XLSX (formatação idêntica à planilha original) ──
-  async function exportXLSX() {
+  async function exportXLSX(isSave = false) {
     if (records.length === 0) {
       showToast('⚠ Nenhum registro para exportar.');
       return;
@@ -2599,7 +3090,7 @@
     // ── Sheet 2: Listas ─────────────────────────────────────
     const ws2 = wb.addWorksheet('Listas');
     const listas = {
-      Escolas: ['EMEF Anísio Teixeira','EMEF Dom Pedro II','EMEF Machado de Assis','EMEF Cecília Meireles','EMEF Rui Barbosa','EMEF Monteiro Lobato','EMEF Clarice Lispector','EMEF Carlos Drummond','EMEF Castro Alves','EMEF Vinícius de Moraes'],
+      Escolas: TODAS_ESCOLAS.slice(0, 226),
       OrdemJudicial: ['Sim','Não'],
       AnoEscolaridade: ['Berçário','G1','G2','G3','Pré I','Pré II','1º ano','2º ano','3º ano','4º ano','5º ano','6º ano','7º ano','8º ano','9º ano'],
       Turno: ['Manhã','Tarde','Integral'],
@@ -2626,9 +3117,11 @@
     const a = document.createElement('a');
     a.href = url;
     a.download = `SIEE_${new Date().toISOString().slice(0,10)}.xlsx`;
+    document.body.appendChild(a);
     a.click();
+    document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    showToast('⬇ Arquivo Excel exportado!');
+    showToast(isSave ? '💾 Dados salvos no HD!' : '⬇ Arquivo Excel exportado!');
   }
 </script>
 </body>
